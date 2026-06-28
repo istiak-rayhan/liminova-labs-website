@@ -31,10 +31,10 @@ export default function Navbar() {
         </div>
 
         {/* CTA Button */}
-        <button className="hidden md:flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm shadow-emerald-200">
-          Book a Consultation
-          <ArrowRight className="w-4 h-4" />
-        </button>
+<Link href="#contact" className="hidden md:flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm shadow-emerald-200">
+  Book a Consultation
+  <ArrowRight className="w-4 h-4" />
+</Link>
       </div>
     </motion.nav>
   );

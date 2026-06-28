@@ -48,13 +48,13 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <button className="w-full sm:w-auto px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-medium text-lg transition-all shadow-lg shadow-emerald-200 flex items-center justify-center gap-2">
-            Start Your Project
-            <ArrowUpRight className="w-5 h-5" />
-          </button>
-          <button className="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 hover:border-emerald-200 hover:bg-emerald-50 text-slate-700 rounded-full font-medium text-lg transition-all">
-            View Our Work
-          </button>
+          <a href="#contact" className="w-full sm:w-auto px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-medium text-lg transition-all shadow-lg shadow-emerald-200 flex items-center justify-center gap-2">
+          Start Your Project
+          <ArrowUpRight className="w-5 h-5" />
+          </a>
+          <a href="#portfolio" className="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 hover:border-emerald-200 hover:bg-emerald-50 text-slate-700 rounded-full font-medium text-lg transition-all flex items-center justify-center text-center">
+          View Our Work
+          </a>
         </motion.div>
       </div>
     </section>

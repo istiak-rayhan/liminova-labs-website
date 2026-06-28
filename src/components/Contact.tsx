@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Mail, Send, CheckCircle2, AlertCircle } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link"; // 👈 এই লিংকটা অ্যাড করা হয়েছে
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -138,9 +139,11 @@ export default function Contact() {
             Liminova Labs
           </div>
           <p>© {new Date().getFullYear()} Liminova Labs. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-emerald-600 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-emerald-600 transition-colors">Terms of Service</a>
+          
+          {/* 👈 নিচের এই অংশটুকু আপডেট করা হয়েছে */}
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            <Link href="/privacy" className="hover:text-emerald-600 transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-emerald-600 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

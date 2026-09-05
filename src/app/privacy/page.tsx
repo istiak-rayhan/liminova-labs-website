@@ -1,29 +1,66 @@
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import type { Metadata } from "next";
+import { site } from "@/data/site";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "How Liminova Labs collects, uses, and retains inquiry data.",
+};
 
 export default function PrivacyPolicy() {
   return (
-    <main className="min-h-screen bg-white pt-24 pb-12">
-      <div className="max-w-3xl mx-auto px-6">
-        <Link href="/" className="inline-flex items-center gap-2 text-emerald-600 font-semibold hover:text-emerald-700 transition-colors mb-8">
-          <ArrowLeft className="w-4 h-4" /> Back to Home
-        </Link>
-        <h1 className="text-4xl font-extrabold text-slate-900 mb-8">Privacy Policy</h1>
-        
-        <div className="prose prose-slate prose-emerald max-w-none text-slate-600 space-y-6">
-          <p>Last updated: {new Date().toLocaleDateString()}</p>
-          
-          <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">1. Information We Collect</h2>
-          <p>At Liminova Labs, we collect information you provide directly to us when you fill out a contact form, request a consultation, or communicate with us via email. This may include your name, email address, and project details.</p>
-          
-          <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">2. How We Use Your Information</h2>
-          <p>We use the information we collect to communicate with you about your project, provide our services, and improve our website. We do not sell or share your personal information with third parties for marketing purposes.</p>
-          
-          <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">3. Data Security</h2>
-          <p>We implement reasonable security measures to protect your personal information. However, please be aware that no method of transmission over the internet is 100% secure.</p>
-          
-          <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">4. Contact Us</h2>
-          <p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:hello@liminovalabs.com" className="text-emerald-600 hover:underline">hello@liminovalabs.com</a>.</p>
+    <main className="bg-white pb-16">
+      <div className="max-w-3xl mx-auto px-6 pt-16">
+        <h1 className="text-4xl font-extrabold text-slate-900 mb-6">Privacy Policy</h1>
+        <p className="text-slate-500 mb-8">Last updated: 5 September 2026</p>
+
+        <div className="space-y-6 text-slate-600 leading-relaxed">
+          <p>
+            This policy applies to {site.legalName} (“we”, “us”) and the website
+            at {site.url}. We are a studio based in Dhaka, Bangladesh, serving
+            clients worldwide. For privacy questions:{" "}
+            <a href={`mailto:${site.email}`} className="text-emerald-600">
+              {site.email}
+            </a>
+            .
+          </p>
+
+          <h2 className="text-2xl font-bold text-slate-900 pt-4">What we collect</h2>
+          <p>
+            When you submit the contact form we collect name, work email,
+            company, project type, budget band, timeline, and message. If you
+            email us directly we also process the contents of that thread. We
+            do not sell personal data.
+          </p>
+
+          <h2 className="text-2xl font-bold text-slate-900 pt-4">Why we collect it</h2>
+          <p>
+            Lawful basis: legitimate interests and, where you tick the consent
+            box, consent to reply about your inquiry. We use the data to
+            evaluate fit, reply, and — if we work together — to open a project
+            file.
+          </p>
+
+          <h2 className="text-2xl font-bold text-slate-900 pt-4">Retention</h2>
+          <p>
+            Unsuccessful inquiries are deleted or archived within 24 months.
+            Contracted project records are kept for the period required by the
+            statement of work and applicable tax law.
+          </p>
+
+          <h2 className="text-2xl font-bold text-slate-900 pt-4">Processors</h2>
+          <p>
+            Email is sent through our configured mail transport (Gmail or a
+            transactional provider). Hosting and analytics may be provided by
+            Vercel. Vercel Analytics is first-party and does not use
+            advertising cookies.
+          </p>
+
+          <h2 className="text-2xl font-bold text-slate-900 pt-4">Your rights</h2>
+          <p>
+            You may request access, correction, or deletion of inquiry data by
+            emailing {site.email}. If you are in the EEA or UK you may also
+            lodge a complaint with your local authority.
+          </p>
         </div>
       </div>
     </main>

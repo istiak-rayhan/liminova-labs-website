@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Liminova Labs
 
-## Getting Started
+Digital transformation partner site: Next.js App Router, Tailwind CSS v4, Framer Motion.
 
-First, run the development server:
+## Scripts
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Content
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Edit shared copy in `src/data/`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `site.ts` — brand, email, and env-driven booking / marketplace URLs
+- `projects.ts` — case studies (single source for list + detail)
+- `services.ts`, `testimonials.ts`, `faqs.ts`, `proof.ts`, `process.ts`
 
-## Learn More
+Swap project screenshots in `public/projects/`. Paths are referenced from `projects.ts`.
 
-To learn more about Next.js, take a look at the following resources:
+## Environment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Copy `.env.example` to `.env.local`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | Canonical domain for sitemap and metadata |
+| `NEXT_PUBLIC_CALENDLY_URL` | Embeds Calendly / Cal.com on `/book` |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Shows the corner WhatsApp button (`wa.me`) |
+| `NEXT_PUBLIC_LINKEDIN_URL` | Footer “Also on” |
+| `NEXT_PUBLIC_FIVERR_URL` | Footer only — never in the header |
+| `NEXT_PUBLIC_UPWORK_URL` | Footer only |
+| `EMAIL_USER` / `EMAIL_PASS` | Contact form mail transport |
 
-## Deploy on Vercel
+Marketplace links stay in the footer on purpose. Direct booking is the primary path.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contact form
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`POST /api/contact` validates with Zod, ignores honeypot spam, rate-limits per IP, emails the studio, and sends a short auto-reply to the sender.

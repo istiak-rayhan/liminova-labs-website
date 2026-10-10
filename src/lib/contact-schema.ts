@@ -4,6 +4,7 @@ export const projectTypes = [
   "Platform engineering",
   "Brand & growth",
   "Advanced tech & AI",
+  "Hire a technical expert",
   "Not sure yet",
 ] as const;
 

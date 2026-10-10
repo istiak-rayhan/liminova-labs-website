@@ -11,16 +11,43 @@ export default function Icon() {
           width: "100%",
           height: "100%",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#10b981",
-          color: "white",
-          fontSize: 20,
-          fontWeight: 700,
-          borderRadius: 8,
+          background: "#ffffff",
+          position: "relative",
         }}
       >
-        L
+        <div
+          style={{
+            position: "absolute",
+            left: 6,
+            bottom: 6,
+            width: 7,
+            height: 18,
+            background: "#10b981",
+            borderRadius: 2,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            left: 6,
+            bottom: 6,
+            width: 16,
+            height: 7,
+            background: "#10b981",
+            borderRadius: 2,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 6,
+            right: 6,
+            width: 5,
+            height: 5,
+            background: "#2dd4bf",
+            transform: "rotate(45deg)",
+          }}
+        />
       </div>
     ),
     { ...size },

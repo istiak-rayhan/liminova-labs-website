@@ -14,7 +14,7 @@ export default function HeroVisual() {
         </div>
         <div className="relative aspect-[16/10] bg-slate-950">
           <Image
-            src="/projects/bfrench1.jpg"
+            src="/projects/bfrench2.jpg"
             alt="B-FRENCH learning platform"
             fill
             className="object-cover object-top"

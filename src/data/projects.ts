@@ -45,11 +45,7 @@ export const projects: Project[] = [
       { value: "In-app", label: "Payments and progress" },
     ],
     tech: ["Flutter", "Node.js", "REST API", "Payment Gateway", "UI/UX"],
-    images: [
-      "/projects/bfrench1.jpg",
-      "/projects/bfrench2.jpg",
-      "/projects/bfrench3.jpg",
-    ],
+    images: ["/projects/bfrench2.jpg", "/projects/bfrench3.jpg"],
   },
   {
     slug: "urbanride",

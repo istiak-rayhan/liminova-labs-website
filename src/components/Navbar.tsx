@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Menu, X } from "lucide-react";
+import BrandLogo from "@/components/BrandLogo";
 import { getBookingHref, site } from "@/data/site";
 
 const links = [
@@ -24,10 +25,8 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-emerald-50"
     >
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
-            <span className="text-white font-bold text-xl leading-none">L</span>
-          </div>
+        <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
+          <BrandLogo size={36} priority />
           <span className="font-bold text-xl text-slate-900 tracking-tight">
             {site.name}
           </span>

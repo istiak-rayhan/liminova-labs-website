@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandLogo from "@/components/BrandLogo";
 import { getMarketplaceLinks, site } from "@/data/site";
 
 export default function Footer() {
@@ -9,9 +10,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-14 grid gap-10 md:grid-cols-4 text-sm">
         <div className="md:col-span-1 space-y-4">
           <div className="flex items-center gap-2 font-semibold text-slate-900 text-lg">
-            <div className="w-6 h-6 rounded-md bg-emerald-500 flex items-center justify-center">
-              <span className="text-white text-xs leading-none">L</span>
-            </div>
+            <BrandLogo size={28} />
             {site.name}
           </div>
           <p className="text-slate-500 leading-relaxed">
@@ -46,6 +45,11 @@ export default function Footer() {
             <li>
               <Link href="/services/advanced-tech-ai" className="hover:text-emerald-600">
                 Advanced tech & AI
+              </Link>
+            </li>
+            <li>
+              <Link href="/services/technical-experts" className="hover:text-emerald-600">
+                Hire a technical expert
               </Link>
             </li>
           </ul>

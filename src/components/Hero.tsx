@@ -46,8 +46,8 @@ export default function Hero() {
             className="text-lg text-slate-600 max-w-xl mb-10 leading-relaxed"
           >
             Flutter and Next.js products first. Then SEO and Meta Ads — only
-            when the funnel can convert. Evaluation, build, scale, profit. One
-            studio.
+            when the funnel can convert. Agencies and product teams can also
+            hire a named technical expert from us.
           </motion.p>
 
           <motion.div

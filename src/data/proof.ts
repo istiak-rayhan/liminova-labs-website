@@ -62,4 +62,10 @@ export const engagementModels = [
     description:
       "SEO, social, and Meta Ads after the product can convert. We will not buy traffic for a broken funnel.",
   },
+  {
+    title: "Embedded expert",
+    duration: "4–12 weeks",
+    description:
+      "Agencies and product teams hire a named Flutter, Next.js, or backend specialist who joins your squad.",
+  },
 ];

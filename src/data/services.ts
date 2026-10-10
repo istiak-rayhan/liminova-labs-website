@@ -8,7 +8,7 @@ export type Service = {
   deliverables: string[];
   timeline: string;
   tags: string[];
-  icon: "code" | "growth" | "ai";
+  icon: "code" | "growth" | "ai" | "people";
 };
 
 export const services: Service[] = [
@@ -74,6 +74,27 @@ export const services: Service[] = [
     timeline: "2–8 weeks for a focused tool or integration.",
     tags: ["Python", "AI & ML", "REST APIs"],
     icon: "ai",
+  },
+  {
+    slug: "technical-experts",
+    title: "Technical Experts",
+    eyebrow: "Staff",
+    summary:
+      "Agencies and product teams can hire a named Flutter, Next.js, or backend expert from us — embedded, not anonymous bench.",
+    description:
+      "Some partners need a person, not a whole build. We place a skilled engineer or product specialist inside your squad: Flutter, Next.js, Node, or growth. They work under your standups and tools. We stay accountable for quality and replacement if the fit is wrong.",
+    audience:
+      "Agencies, consultancies, and product companies that need senior capacity without a full-time hire — or a studio that wants a trusted specialist on a client account.",
+    deliverables: [
+      "Named expert, not a rotating bench",
+      "Flutter, Next.js, Node, or growth profiles",
+      "Weekly reporting back to your lead",
+      "Overlap hours with your timezone",
+      "Swap or extend with two weeks’ notice",
+    ],
+    timeline: "Typical embedding: 4–12 weeks, part-time or full-time.",
+    tags: ["Flutter", "Next.js", "Embedded"],
+    icon: "people",
   },
 ];
 

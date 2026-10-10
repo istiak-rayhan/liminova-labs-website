@@ -32,7 +32,8 @@ Copy `.env.example` to `.env.local`.
 | `NEXT_PUBLIC_LINKEDIN_URL` | Footer “Also on” |
 | `NEXT_PUBLIC_FIVERR_URL` | Footer only — never in the header |
 | `NEXT_PUBLIC_UPWORK_URL` | Footer only |
-| `EMAIL_USER` / `EMAIL_PASS` | Contact form mail transport |
+| `EMAIL_USER` / `EMAIL_PASS` | Contact form SMTP (Gmail app password) |
+| `EMAIL_TO` | Inbox that receives inquiries (defaults to `liminovalabs@gmail.com`) |
 
 Marketplace links stay in the footer on purpose. Direct booking is the primary path.
 

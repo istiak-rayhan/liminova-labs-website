@@ -63,9 +63,10 @@ export default function AboutPage() {
         </p>
         <p>
           Who we work with: founders and operators who can make a decision in a
-          week. Who we will not take: teams shopping for the cheapest sprint,
-          or growth campaigns against a product that cannot convert. That
-          refusal is part of the standard.
+          week — and agencies that need a named Flutter, Next.js, or backend
+          expert inside their own squad. Who we will not take: teams shopping
+          for the cheapest sprint, or growth campaigns against a product that
+          cannot convert. That refusal is part of the standard.
         </p>
       </section>
 

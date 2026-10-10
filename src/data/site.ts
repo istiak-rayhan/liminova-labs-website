@@ -1,7 +1,7 @@
 export const site = {
   name: "Liminova Labs",
   legalName: "Liminova Labs",
-  email: "hello@liminovalabs.com",
+  email: "liminovalabs@gmail.com",
   location: "Dhaka-based, serving globally",
   responseSla: "We reply within one business day.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://liminovalabs.com",

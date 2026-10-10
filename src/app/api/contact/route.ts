@@ -41,6 +41,8 @@ export async function POST(request: Request) {
       );
     }
 
+    const inbox = process.env.EMAIL_TO || site.email;
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -63,7 +65,7 @@ export async function POST(request: Request) {
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER,
+      to: inbox,
       replyTo: data.email,
       subject: `New Liminova Labs inquiry from ${data.name} (${data.company})`,
       text,

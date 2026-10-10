@@ -17,7 +17,7 @@ export default function Engagement() {
             No public price list. A clear model so you know what you are buying.
           </p>
         </div>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
           {engagementModels.map((model, index) => (
             <motion.div
               key={model.title}

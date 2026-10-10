@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Code2, TrendingUp, Cpu, ArrowRight } from "lucide-react";
+import { Code2, TrendingUp, Cpu, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { services } from "@/data/services";
 
@@ -9,6 +9,7 @@ const icons = {
   code: Code2,
   growth: TrendingUp,
   ai: Cpu,
+  people: Users,
 };
 
 const accents = [
@@ -27,6 +28,11 @@ const accents = [
     borderColor: "hover:border-purple-200",
     shadowColor: "hover:shadow-purple-900/5",
   },
+  {
+    color: "bg-amber-100 text-amber-600",
+    borderColor: "hover:border-amber-200",
+    shadowColor: "hover:shadow-amber-900/5",
+  },
 ];
 
 export default function Services() {
@@ -42,7 +48,7 @@ export default function Services() {
             viewport={{ once: true }}
             className="inline-block py-1 px-3 rounded-full bg-slate-100 text-slate-600 text-sm font-bold uppercase tracking-wider mb-4"
           >
-            Three pillars
+            What we offer
           </motion.span>
           <motion.h2
             initial={reduceMotion ? false : { opacity: 0, y: 20 }}
@@ -59,12 +65,12 @@ export default function Services() {
             className="text-slate-600 text-lg leading-relaxed"
           >
             We evaluate the brand, engineer the platform, then grow demand
-            against something that can convert. Flutter, Next.js, and paid
-            acquisition — one accountable studio.
+            against something that can convert. Agencies can also hire a named
+            technical expert into their own squad.
           </motion.p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {services.map((service, index) => {
             const Icon = icons[service.icon];
             const accent = accents[index];

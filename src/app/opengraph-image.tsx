@@ -30,19 +30,22 @@ export default function OpenGraphImage() {
         >
           <div
             style={{
-              width: 48,
-              height: 48,
+              width: 56,
+              height: 56,
               background: "#10b981",
-              color: "white",
+              borderRadius: 14,
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 12,
-              fontSize: 28,
             }}
-          >
-            L
-          </div>
+          />
+          <div
+            style={{
+              width: 14,
+              height: 14,
+              background: "#2dd4bf",
+              transform: "rotate(45deg)",
+              marginLeft: -6,
+            }}
+          />
           Liminova Labs
         </div>
         <div
@@ -64,7 +67,7 @@ export default function OpenGraphImage() {
             We design, ship, and grow product platforms.
           </div>
           <div style={{ fontSize: 28, color: "#475569" }}>
-            Flutter · Next.js · SEO & Meta Ads · Dhaka, serving globally
+            Flutter · Next.js · Growth · Embedded experts · Dhaka, serving globally
           </div>
         </div>
       </div>

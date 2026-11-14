@@ -4,7 +4,7 @@ export const site = {
   email: "hello@liminovalabs.com",
   location: "Dhaka-based, serving globally",
   responseSla: "We reply within one business day.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://liminovalabs.com",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://liminovalabs.io",
   calendly: process.env.NEXT_PUBLIC_CALENDLY_URL ?? "",
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "",
   linkedin: process.env.NEXT_PUBLIC_LINKEDIN_URL ?? "",

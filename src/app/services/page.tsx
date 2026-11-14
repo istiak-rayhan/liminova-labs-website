@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import StartHere from "@/components/StartHere";
 import { services } from "@/data/services";
 
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Platform engineering, brand and growth marketing, and applied AI — the three Liminova Labs pillars.",
+    "Platform engineering, brand and growth marketing, applied AI, and embedded technical experts — pick a lane or start with a brief.",
 };
 
 export default function ServicesIndexPage() {
@@ -15,14 +16,14 @@ export default function ServicesIndexPage() {
         <p className="text-sm font-bold uppercase tracking-wider text-emerald-600 mb-4">
           Services
         </p>
-        <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
+        <h1 className="font-display text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
           What we take on
         </h1>
         <p className="text-lg text-slate-600 max-w-2xl mb-14">
-          Three capabilities. You can buy one, or the whole loop from evaluation
-          to growth.
+          Build, grow, or embed an expert. You can buy one lane — or the whole
+          loop from evaluation to demand.
         </p>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
           {services.map((service) => (
             <Link
               key={service.slug}
@@ -40,6 +41,7 @@ export default function ServicesIndexPage() {
           ))}
         </div>
       </div>
+      <StartHere />
     </main>
   );
 }

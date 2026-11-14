@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ExternalLink, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import TrackLink from "@/components/TrackLink";
 import type { Project } from "@/data/projects";
 
 export default function Portfolio({ projects }: { projects: Project[] }) {
@@ -69,12 +70,14 @@ export default function Portfolio({ projects }: { projects: Project[] }) {
                   </span>
                 ))}
               </div>
-              <Link
+              <TrackLink
                 href={`/portfolio/${featured.slug}`}
+                event="case_study_open"
+                eventData={{ project: featured.slug, placement: "featured" }}
                 className="inline-flex items-center gap-2 text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors"
               >
                 Read the case study <ExternalLink className="w-4 h-4" />
-              </Link>
+              </TrackLink>
             </div>
           </motion.div>
 
@@ -113,12 +116,14 @@ export default function Portfolio({ projects }: { projects: Project[] }) {
                   </span>
                 ))}
               </div>
-              <Link
+              <TrackLink
                 href={`/portfolio/${project.slug}`}
+                event="case_study_open"
+                eventData={{ project: project.slug, placement: "grid" }}
                 className="inline-flex items-center gap-2 text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors"
               >
                 Read the case study <ExternalLink className="w-4 h-4" />
-              </Link>
+              </TrackLink>
             </motion.div>
           ))}
         </div>

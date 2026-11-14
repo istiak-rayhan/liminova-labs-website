@@ -16,6 +16,10 @@ export type Project = {
   approach: string;
   outcome: string;
   role: string;
+  /** Problem state before engagement (case study strip). */
+  before?: string;
+  /** Shipped surface after engagement (case study strip). */
+  after?: string;
   metrics: ProjectMetric[];
   tech: string[];
   images: string[];
@@ -39,11 +43,15 @@ export const projects: Project[] = [
       "We engineered a full stack: a dark-mode Next.js learner web app, Flutter mobile clients, and a multi-role admin (overview, users, courses, enrollments, gradebook, exam banks, site content). Live sessions, recorded catalogs, and progress share one product model.",
     outcome:
       "A production LMS ecosystem live at b-french-web — web, mobile, and operations in one accountable build instead of bolted-together tools.",
+    before:
+      "Scattered tools for classes, enrollments, and exams — no single learner or admin product.",
+    after:
+      "One LMS: Next.js learner web, Flutter mobile, and a 4-role operations dashboard in production.",
     role: "Product design and full-stack platform engineering",
     metrics: [
-      { value: "4", label: "Dashboard roles shipped" },
-      { value: "Web + mobile", label: "Learner surfaces" },
-      { value: "Live + recorded", label: "Lesson formats" },
+      { value: "4 roles", label: "Admin surfaces shipped" },
+      { value: "Web + mobile", label: "Learner clients live" },
+      { value: "1 product", label: "Courses, exams, ops together" },
     ],
     tech: ["Next.js", "Flutter", "Node.js", "REST API", "Payment Gateway"],
     images: [
@@ -70,11 +78,15 @@ export const projects: Project[] = [
       "We shipped an operations dashboard with overview KPIs, quick actions, product/customer/supplier modules, stock movements, and expense tracking — structured for day-to-day warehouse workflows.",
     outcome:
       "A production inventory SaaS live at primexn.fr, giving the business a dedicated operations workspace instead of ad-hoc tooling.",
+    before:
+      "Spreadsheets and ad-hoc tools for stock, receive/issue, and supplier records.",
+    after:
+      "A live ops SaaS at primexn.fr — inventory, documents, and movements in one workspace.",
     role: "Product engineering and operations UI",
     metrics: [
-      { value: "EUR", label: "Ops workspace for FR business" },
-      { value: "Stock + docs", label: "Receive, issue, invoices" },
-      { value: "Live", label: "primexn.fr in production" },
+      { value: "Live FR", label: "primexn.fr in production" },
+      { value: "Receive → issue", label: "Stock workflows shipped" },
+      { value: "1 workspace", label: "Products, suppliers, docs" },
     ],
     tech: ["Next.js", "TypeScript", "Dashboard UX", "Inventory workflows"],
     images: ["/projects/primexn.png"],
@@ -96,11 +108,15 @@ export const projects: Project[] = [
       "We built Prep-Civique around practice modules (Republic, history, values, institutions, society), timed 40-question mocks, candidate stats, and referral/premium paths — then shipped to Play Store under Torc Digital.",
     outcome:
       "A live Play Store app (com.torcdigital.prepcivique) candidates can install for structured civic exam preparation.",
+    before:
+      "No dedicated mobile product for themed practice and timed civic mocks.",
+    after:
+      "Live on Google Play — practice themes, 40-question mocks, and progress stats.",
     role: "Mobile product engineering",
     metrics: [
       { value: "Play Store", label: "Live consumer app" },
       { value: "40 Q", label: "Timed mock exams" },
-      { value: "Multi-lang", label: "Practice for diverse candidates" },
+      { value: "Multi-lang", label: "Built for diverse candidates" },
     ],
     tech: ["Flutter", "Mobile UX", "Exam engine", "Play Store"],
     images: ["/projects/prepcivic1.png", "/projects/prepcivic2.png"],
@@ -123,11 +139,15 @@ export const projects: Project[] = [
       "We designed the rider home around destination search, recents, and saved places, then implemented the stack in Flutter with Firebase and maps. Booking, tracking, and wallet-adjacent payment flows sit in one release train.",
     outcome:
       "A production ride-hailing client covering onboarding, home, journey, and pickup — ready for an operator to run rider and trip flows on both stores.",
+    before:
+      "A need for rider booking on both stores without funding two native teams.",
+    after:
+      "One Flutter client: search, booking, live maps, and trip flows for iOS and Android.",
     role: "Product design and mobile engineering",
     metrics: [
-      { value: "1", label: "Codebase for iOS and Android" },
+      { value: "1 codebase", label: "iOS and Android" },
       { value: "Live maps", label: "Booking and trip tracking" },
-      { value: "4", label: "Core rider screens shipped" },
+      { value: "4 screens", label: "Core rider journey shipped" },
     ],
     tech: ["Flutter", "Firebase", "Maps API", "Real-time DB"],
     images: [
@@ -155,8 +175,8 @@ export const projects: Project[] = [
       "A production e-commerce surface the retailer can merchandise without fighting the theme layer — catalog, new arrivals, and cart UX on a single fast web app.",
     role: "Storefront engineering and UI implementation",
     metrics: [
-      { value: "Next.js", label: "Storefront, not a heavyweight theme" },
-      { value: "Catalog + bag", label: "Merchandising path shipped" },
+      { value: "Next.js", label: "Storefront, not a heavy theme" },
+      { value: "Catalog → bag", label: "Merchandising path shipped" },
       { value: "Stripe", label: "Checkout-ready payments" },
     ],
     tech: ["Next.js", "React", "Tailwind CSS", "Stripe"],

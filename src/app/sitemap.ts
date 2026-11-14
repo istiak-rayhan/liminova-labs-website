@@ -6,7 +6,16 @@ import { site } from "@/data/site";
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  const staticRoutes = ["", "/about", "/portfolio", "/services", "/book", "/privacy", "/terms"].map(
+  const staticRoutes = [
+    "",
+    "/about",
+    "/portfolio",
+    "/services",
+    "/book",
+    "/faq",
+    "/privacy",
+    "/terms",
+  ].map(
     (path) => ({
       url: `${site.url}${path}`,
       lastModified: now,

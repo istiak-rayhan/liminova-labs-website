@@ -1,6 +1,8 @@
 import Hero from "@/components/Hero";
 import TechMarquee from "@/components/TechMarquee";
 import ProofStrip from "@/components/ProofStrip";
+import BuiltFor from "@/components/BuiltFor";
+import StartHere from "@/components/StartHere";
 import Services from "@/components/Services";
 import Industries from "@/components/Industries";
 import Engagement from "@/components/Engagement";
@@ -19,6 +21,8 @@ export default async function Home() {
       <Hero />
       <TechMarquee />
       <ProofStrip />
+      <BuiltFor />
+      <StartHere />
       <Services />
       <Industries />
       <Engagement />

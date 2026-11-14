@@ -1,10 +1,11 @@
 "use client";
 
-import { faqs } from "@/data/faqs";
+import Link from "next/link";
+import { homepageFaqs } from "@/data/faqs";
 
 export default function FAQ() {
-  const midpoint = Math.ceil(faqs.length / 2);
-  const columns = [faqs.slice(0, midpoint), faqs.slice(midpoint)];
+  const midpoint = Math.ceil(homepageFaqs.length / 2);
+  const columns = [homepageFaqs.slice(0, midpoint), homepageFaqs.slice(midpoint)];
 
   return (
     <section id="faq" className="py-24">
@@ -37,6 +38,14 @@ export default function FAQ() {
             </div>
           ))}
         </div>
+        <p className="text-center mt-10">
+          <Link
+            href="/faq"
+            className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+          >
+            See all FAQs
+          </Link>
+        </p>
       </div>
     </section>
   );

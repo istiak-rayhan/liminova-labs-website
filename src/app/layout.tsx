@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Syne } from "next/font/google";
+import { Manrope, Outfit } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
 import JsonLd from "@/components/JsonLd";
 import { site } from "@/data/site";
 
-const sans = Plus_Jakarta_Sans({
+const sans = Manrope({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
 });
 
-const display = Syne({
+const display = Outfit({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",

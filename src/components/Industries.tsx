@@ -19,18 +19,18 @@ export default function Industries() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="py-20 border-t border-slate-200/60">
+    <section className="py-24 border-t border-slate-200/60">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="max-w-2xl mb-12">
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-3">
+        <div className="max-w-2xl mb-14">
+          <h2 className="font-display text-3xl md:text-[2.75rem] font-semibold text-slate-900 mb-4">
             Industries we ship in
           </h2>
-          <p className="text-slate-600 text-lg">
+          <p className="text-slate-600 text-lg leading-8">
             Six production categories — not a logo wall. The portfolio is the
             proof.
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {industries.map((industry, index) => {
             const Icon = icons[index % icons.length];
             const accent = accentMap[industry.accent] ?? accentMap.emerald;
@@ -41,17 +41,17 @@ export default function Industries() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="rounded-[1.5rem] border border-slate-200/80 bg-white/80 backdrop-blur-sm p-7 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.45)] hover:-translate-y-1 transition-transform duration-300"
+                className="rounded-[1.75rem] border border-slate-200/80 bg-white/90 backdrop-blur-sm p-8 min-h-[15rem] shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)] hover:-translate-y-1 transition-transform duration-300"
               >
                 <div
                   className={`w-11 h-11 rounded-xl bg-gradient-to-br ring-1 mb-5 flex items-center justify-center ${accent}`}
                 >
                   <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="font-display text-xl font-bold text-slate-900 mb-3">
+                <h3 className="font-display text-xl font-semibold text-slate-900 mb-3">
                   {industry.title}
                 </h3>
-                <p className="text-slate-600 leading-relaxed">{industry.description}</p>
+                <p className="text-slate-600 leading-8">{industry.description}</p>
               </motion.div>
             );
           })}

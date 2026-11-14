@@ -1,7 +1,9 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Upload, X } from "lucide-react";
 import type { CmsProject, ProjectStatus } from "@/lib/cms-types";
 
 const statuses: ProjectStatus[] = ["pipeline", "ongoing", "completed"];
@@ -31,7 +33,7 @@ const emptyForm = (): Omit<CmsProject, "updatedAt"> => ({
     { label: "Metric", value: "—" },
   ],
   tech: [],
-  images: ["/projects/bfrench1.jpg"],
+  images: [],
   liveUrl: "",
 });
 
@@ -47,9 +49,9 @@ export default function ProjectManager({
   const [editing, setEditing] = useState<ReturnType<typeof emptyForm> | null>(null);
   const [partnersText, setPartnersText] = useState("");
   const [techText, setTechText] = useState("");
-  const [imagesText, setImagesText] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const visible = useMemo(
     () => (filter ? projects.filter((project) => project.status === filter) : projects),
@@ -62,14 +64,51 @@ export default function ProjectManager({
     setEditing(draft);
     setPartnersText("");
     setTechText("");
-    setImagesText(draft.images.join(", "));
   }
 
   function startEdit(project: CmsProject) {
     setEditing({ ...project });
     setPartnersText(project.partners.join(", "));
     setTechText(project.tech.join(", "));
-    setImagesText(project.images.join(", "));
+  }
+
+  async function uploadFiles(fileList: FileList | null) {
+    if (!editing || !fileList?.length) return;
+    setUploading(true);
+    setError("");
+    try {
+      const uploaded: string[] = [];
+      for (const file of Array.from(fileList)) {
+        const body = new FormData();
+        body.append("file", file);
+        const response = await fetch("/api/cms/upload", {
+          method: "POST",
+          body,
+        });
+        if (!response.ok) {
+          const data = (await response.json()) as { error?: string };
+          throw new Error(data.error ?? `Failed to upload ${file.name}`);
+        }
+        const data = (await response.json()) as { url: string };
+        uploaded.push(data.url);
+      }
+      setEditing({
+        ...editing,
+        images: [...editing.images, ...uploaded],
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeImage(url: string) {
+    if (!editing) return;
+    setEditing({
+      ...editing,
+      images: editing.images.filter((image) => image !== url),
+    });
   }
 
   async function save(event: FormEvent) {
@@ -88,10 +127,9 @@ export default function ProjectManager({
         .split(",")
         .map((item) => item.trim())
         .filter(Boolean),
-      images: imagesText
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean),
+      images: editing.images.length
+        ? editing.images
+        : ["/projects/bfrench-web.png"],
       updatedAt: new Date().toISOString(),
     };
     try {
@@ -138,7 +176,7 @@ export default function ProjectManager({
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-bold text-slate-900">Projects</h1>
+          <h1 className="font-display text-3xl font-semibold text-slate-900">Projects</h1>
           <p className="text-slate-500 mt-1">
             Treat each engagement like inventory — pipeline, ongoing, completed.
             Published completed work appears on Selected work.
@@ -269,23 +307,68 @@ export default function ProjectManager({
               className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
             />
           </label>
-          <label className="block text-sm md:col-span-2">
-            <span className="font-medium text-slate-700">
-              Image paths (comma-separated, under /public)
-            </span>
-            <input
-              value={imagesText}
-              onChange={(event) => setImagesText(event.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
-            />
-          </label>
+
+          <div className="md:col-span-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <p className="font-medium text-slate-900">Project images</p>
+                <p className="text-sm text-slate-500">
+                  Upload screenshots directly (JPG, PNG, WebP — max 8MB each).
+                </p>
+              </div>
+              <label className="inline-flex items-center gap-2 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 cursor-pointer hover:border-emerald-300">
+                <Upload className="w-4 h-4" />
+                {uploading ? "Uploading…" : "Upload files"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                  multiple
+                  className="hidden"
+                  disabled={uploading}
+                  onChange={(event) => {
+                    void uploadFiles(event.target.files);
+                    event.target.value = "";
+                  }}
+                />
+              </label>
+            </div>
+            {editing.images.length ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {editing.images.map((image) => (
+                  <div
+                    key={image}
+                    className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-white"
+                  >
+                    <Image
+                      src={image}
+                      alt="Project attachment"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(image)}
+                      className="absolute top-2 right-2 rounded-full bg-slate-900/70 text-white p-1"
+                      aria-label="Remove image"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">No images yet.</p>
+            )}
+          </div>
+
           {error ? (
             <p className="md:col-span-2 text-sm text-red-600">{error}</p>
           ) : null}
           <div className="md:col-span-2 flex gap-3">
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || uploading}
               className="rounded-full bg-emerald-500 text-white px-4 py-2 text-sm font-semibold disabled:opacity-60"
             >
               {saving ? "Saving…" : "Save project"}

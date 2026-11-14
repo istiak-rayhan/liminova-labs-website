@@ -93,10 +93,4 @@ export const engagementModels = [
       "Agencies and product teams hire a named Flutter, Next.js, or backend engineer into their own squad.",
     accent: "teal",
   },
-  {
-    title: "Embedded expert",
-    duration: "4–12 weeks",
-    description:
-      "Agencies and product teams hire a named Flutter, Next.js, or backend specialist who joins your squad.",
-  },
 ];

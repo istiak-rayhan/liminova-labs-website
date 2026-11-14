@@ -51,7 +51,7 @@ export default function Services() {
             initial={reduceMotion ? false : { opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-block py-1.5 px-3 rounded-full bg-white/80 border border-emerald-100 text-slate-600 text-xs font-bold uppercase tracking-[0.18em] mb-4"
+            className="inline-block py-1.5 px-3.5 rounded-full bg-white/80 border border-emerald-100 text-slate-600 text-xs font-semibold uppercase tracking-[0.14em] mb-5"
           >
             What we offer
           </motion.span>
@@ -59,7 +59,7 @@ export default function Services() {
             initial={reduceMotion ? false : { opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-display text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight"
+            className="font-display text-3xl md:text-[3rem] font-semibold text-slate-900 mb-6"
           >
             From evaluation to <span className="text-emerald-500">profit.</span>
           </motion.h2>
@@ -67,7 +67,7 @@ export default function Services() {
             initial={reduceMotion ? false : { opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-slate-600 text-lg leading-relaxed"
+            className="text-slate-600 text-lg leading-8"
           >
             We evaluate the brand, engineer the platform, then grow demand
             against something that can convert. Agencies can also hire a named
@@ -75,7 +75,7 @@ export default function Services() {
           </motion.p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-7">
           {services.map((service, index) => {
             const Icon = icons[service.icon];
             const accent = accents[index % accents.length];
@@ -87,7 +87,7 @@ export default function Services() {
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.55, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
                 style={{ ["--card-tint" as string]: accent.tint }}
-                className={`card-sheen group relative overflow-hidden rounded-[1.75rem] border border-white/80 p-8 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.35)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_28px_60px_-24px_rgba(15,23,42,0.4)] ${accent.glow}`}
+                className={`card-sheen card-roomy group relative overflow-hidden rounded-[1.75rem] border border-white/80 p-9 md:p-10 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.3)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_28px_60px_-24px_rgba(15,23,42,0.38)] flex flex-col ${accent.glow}`}
               >
                 <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${accent.bar}`} />
                 <div
@@ -95,13 +95,13 @@ export default function Services() {
                 >
                   <Icon className="w-7 h-7" />
                 </div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400 mb-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400 mb-2">
                   {service.eyebrow}
                 </p>
-                <h3 className="font-display text-2xl font-bold text-slate-900 mb-4">
+                <h3 className="font-display text-2xl font-semibold text-slate-900 mb-4">
                   {service.title}
                 </h3>
-                <p className="text-slate-600 leading-relaxed mb-8">{service.summary}</p>
+                <p className="text-slate-600 text-[1.05rem] leading-8 mb-8 flex-grow">{service.summary}</p>
                 <div className="flex flex-wrap gap-2 mb-8">
                   {service.tags.map((tag) => (
                     <span

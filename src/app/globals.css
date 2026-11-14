@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #f4f7f5;
+  --color-background: #f3f6f4;
   --color-foreground: #0b1220;
   --color-ink: #0b1220;
   --color-mist: #e8efeb;
@@ -14,21 +14,29 @@
 
 body {
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(16, 185, 129, 0.12), transparent 55%),
-    radial-gradient(900px 500px at 90% 0%, rgba(14, 165, 233, 0.08), transparent 50%),
+    radial-gradient(1200px 600px at 10% -10%, rgba(16, 185, 129, 0.1), transparent 55%),
+    radial-gradient(900px 500px at 90% 0%, rgba(14, 165, 233, 0.07), transparent 50%),
     var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+  line-height: 1.65;
 }
 
 .font-display {
   font-family: var(--font-display), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 .card-sheen {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.72)),
-    linear-gradient(135deg, var(--card-tint, rgba(16, 185, 129, 0.08)), transparent 55%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.88)),
+    linear-gradient(145deg, var(--card-tint, rgba(16, 185, 129, 0.1)), transparent 60%);
+}
+
+.card-roomy {
+  min-height: 17rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

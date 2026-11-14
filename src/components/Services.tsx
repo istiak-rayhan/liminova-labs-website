@@ -2,8 +2,16 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { Code2, TrendingUp, Cpu, Users, ArrowRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { services } from "@/data/services";
+
+const backgrounds: Record<string, string> = {
+  "platform-engineering": "/services/platform.jpg",
+  "brand-growth": "/services/growth.jpg",
+  "advanced-tech-ai": "/services/ai.jpg",
+  "technical-experts": "/services/experts.jpg",
+};
 
 const icons = {
   code: Code2,
@@ -86,10 +94,22 @@ export default function Services() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.55, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                style={{ ["--card-tint" as string]: accent.tint }}
-                className={`card-sheen card-roomy group relative overflow-hidden rounded-[1.75rem] border border-white/80 p-9 md:p-10 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.3)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_28px_60px_-24px_rgba(15,23,42,0.38)] flex flex-col ${accent.glow}`}
+                className={`card-roomy group relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-white p-9 md:p-10 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.3)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_28px_60px_-24px_rgba(15,23,42,0.38)] flex flex-col ${accent.glow}`}
               >
-                <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${accent.bar}`} />
+                {backgrounds[service.slug] ? (
+                  <div className="pointer-events-none absolute inset-0" aria-hidden>
+                    <Image
+                      src={backgrounds[service.slug]}
+                      alt=""
+                      fill
+                      sizes="(min-width: 768px) 50vw, 100vw"
+                      className="object-cover object-right"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-white from-20% via-white/90 to-white/58" />
+                  </div>
+                ) : null}
+                <div className={`absolute inset-x-0 top-0 z-10 h-1 bg-gradient-to-r ${accent.bar}`} />
+                <div className="relative z-10 flex flex-col flex-grow">
                 <div
                   className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-7 ring-1 transition-transform duration-500 group-hover:scale-110 ${accent.icon}`}
                 >
@@ -119,6 +139,7 @@ export default function Services() {
                   Explore capabilities
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
+                </div>
               </motion.div>
             );
           })}

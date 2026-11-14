@@ -3,80 +3,88 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import BookingSteps from "@/components/BookingSteps";
 import HeroVisual from "@/components/HeroVisual";
-import { getBookingHref } from "@/data/site";
+import { getBookingHref, site } from "@/data/site";
+import { track } from "@/lib/track";
 
 export default function Hero() {
   const reduceMotion = useReducedMotion();
   const initial = reduceMotion ? false : { opacity: 0, y: 20 };
 
   return (
-    <section className="relative min-h-[calc(100svh-5rem)] flex items-center overflow-hidden bg-slate-50">
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-200/40 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-teal-100/40 rounded-full blur-3xl pointer-events-none" />
+    <section className="relative min-h-[calc(100svh-5rem)] flex items-center overflow-hidden">
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-200/35 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-teal-100/35 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 lg:py-24 grid lg:grid-cols-2 gap-14 lg:gap-16 items-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 lg:py-20 grid lg:grid-cols-2 gap-14 lg:gap-16 items-center">
         <div>
-          <motion.div
+          <motion.p
             initial={initial}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.55, ease: "easeOut" }}
+            className="font-display text-emerald-700 text-sm font-semibold tracking-[0.08em] uppercase mb-5"
           >
-            <span className="inline-block py-1 px-3 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium mb-6">
-              Digital transformation partner · Dhaka, serving globally
-            </span>
-          </motion.div>
+            {site.name}
+          </motion.p>
 
           <motion.h1
             initial={initial}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6"
+            transition={{ duration: 0.55, delay: 0.08, ease: "easeOut" }}
+            className="font-display text-4xl sm:text-5xl lg:text-[3.35rem] font-semibold text-slate-900 leading-[1.12] mb-6"
           >
-            We design, ship, and grow the platforms that become your{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400">
-              product business.
-            </span>
+            We design, ship, and grow the platforms that become your product
+            business.
           </motion.h1>
 
           <motion.p
             initial={initial}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            className="text-lg text-slate-600 max-w-xl mb-10 leading-relaxed"
+            transition={{ duration: 0.55, delay: 0.16, ease: "easeOut" }}
+            className="text-lg text-slate-600 max-w-xl mb-8 leading-8"
           >
-            Flutter and Next.js products first. Then SEO and Meta Ads — only
-            when the funnel can convert. Agencies and product teams can also
-            hire a named technical expert from us.
+            Flutter and Next.js products first. Then SEO and Meta Ads — only when
+            the funnel can convert. Dhaka-based, serving globally.
           </motion.p>
 
           <motion.div
             initial={initial}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.55, delay: 0.24, ease: "easeOut" }}
             className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4"
           >
             <Link
               href={getBookingHref()}
-              className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-medium text-lg transition-all shadow-lg shadow-emerald-200 flex items-center justify-center gap-2"
+              onClick={() => track("cta_book_hero")}
+              className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-medium text-lg transition-all shadow-lg shadow-emerald-200/80 flex items-center justify-center gap-2"
             >
               Book a consultation
               <ArrowUpRight className="w-5 h-5" />
             </Link>
             <Link
-              href="/portfolio"
-              className="px-8 py-4 bg-white border border-slate-200 hover:border-emerald-200 hover:bg-emerald-50 text-slate-700 rounded-full font-medium text-lg transition-all flex items-center justify-center"
+              href="/#contact"
+              onClick={() => track("cta_brief_hero")}
+              className="px-8 py-4 text-slate-700 hover:text-emerald-700 font-medium text-lg transition-colors flex items-center justify-center"
             >
-              View the work
+              Or send a brief
             </Link>
+          </motion.div>
+
+          <motion.div
+            initial={initial}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.32, ease: "easeOut" }}
+          >
+            <BookingSteps compact />
           </motion.div>
         </div>
 
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-          className="pb-10 lg:pb-0"
+          transition={{ duration: 0.7, delay: 0.18, ease: "easeOut" }}
+          className="pb-6 lg:pb-0"
         >
           <HeroVisual />
         </motion.div>

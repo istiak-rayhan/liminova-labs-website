@@ -16,11 +16,14 @@ export type CmsProject = {
   approach: string;
   outcome: string;
   role: string;
+  before?: string;
+  after?: string;
   quotation: string;
   timeline: string;
   partners: string[];
   metrics: { label: string; value: string }[];
   tech: string[];
+  /** First image is the cover used on listings and case-study hero. */
   images: string[];
   liveUrl?: string;
   updatedAt: string;

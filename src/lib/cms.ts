@@ -64,9 +64,39 @@ async function writeBlob(store: CmsStore) {
   });
 }
 
+function enrichFromSeed(store: CmsStore): { store: CmsStore; changed: boolean } {
+  const seeds = createSeedStore().projects;
+  const bySlug = new Map(seeds.map((project) => [project.slug, project]));
+  let changed = false;
+
+  const projects = store.projects.map((project) => {
+    const seed = bySlug.get(project.slug);
+    if (!seed?.before || project.before) return project;
+
+    // One-time upgrade for seeded portfolio entries missing before/after proof.
+    changed = true;
+    return {
+      ...project,
+      before: seed.before,
+      after: seed.after,
+      metrics: seed.metrics,
+      summary: seed.summary,
+      challenge: seed.challenge,
+      approach: seed.approach,
+      outcome: seed.outcome,
+    };
+  });
+
+  return { store: changed ? { ...store, projects } : store, changed };
+}
+
 export async function getCmsStore(): Promise<CmsStore> {
   const existing = hasBlob() ? await readBlob() : await readLocal();
-  if (existing?.version === 1) return existing;
+  if (existing?.version === 1) {
+    const { store, changed } = enrichFromSeed(existing);
+    if (changed) await saveCmsStore(store);
+    return store;
+  }
   const seeded = createSeedStore();
   await saveCmsStore(seeded);
   return seeded;
@@ -93,6 +123,8 @@ export function cmsProjectToPublic(project: CmsProject): Project {
     approach: project.approach,
     outcome: project.outcome,
     role: project.role,
+    before: project.before || undefined,
+    after: project.after || undefined,
     metrics: project.metrics,
     tech: project.tech,
     images: project.images.length ? project.images : ["/projects/bfrench1.jpg"],

@@ -4,8 +4,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Mail, Send, CheckCircle2, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
-import { track } from "@vercel/analytics";
 import { site } from "@/data/site";
+import { track } from "@/lib/track";
 import {
   budgetBands,
   projectTypes,
@@ -49,7 +49,11 @@ export default function Contact() {
       if (res.ok) {
         setStatus("success");
         setFormData(emptyForm);
-        track("contact_submit");
+        track("contact_submit", {
+          projectType: formData.projectType,
+          budget: formData.budget,
+          timeline: formData.timeline,
+        });
         setTimeout(() => setStatus("idle"), 5000);
       } else {
         setStatus("error");
@@ -77,14 +81,14 @@ export default function Contact() {
               viewport={{ once: true }}
               className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight"
             >
-              Tell us what you want{" "}
+              Send a one-screen{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400">
-                to ship.
+                project brief.
               </span>
             </motion.h2>
             <p className="text-slate-600 text-lg mb-8 max-w-md leading-relaxed">
-              A short brief is enough. {site.responseSla} Prefer a calendar
-              slot?{" "}
+              Budget, timeline, and what should exist in 90 days. {site.responseSla}{" "}
+              Prefer a calendar slot?{" "}
               <Link href="/book" className="text-emerald-600 font-semibold">
                 Book a consultation
               </Link>

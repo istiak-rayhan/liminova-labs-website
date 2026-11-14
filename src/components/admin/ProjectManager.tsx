@@ -3,7 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Upload, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Star, Upload, X } from "lucide-react";
 import type { CmsProject, ProjectStatus } from "@/lib/cms-types";
 
 const statuses: ProjectStatus[] = ["pipeline", "ongoing", "completed"];
@@ -24,6 +24,8 @@ const emptyForm = (): Omit<CmsProject, "updatedAt"> => ({
   approach: "",
   outcome: "",
   role: "Product engineering",
+  before: "",
+  after: "",
   quotation: "",
   timeline: "",
   partners: [],
@@ -109,6 +111,24 @@ export default function ProjectManager({
       ...editing,
       images: editing.images.filter((image) => image !== url),
     });
+  }
+
+  function moveImage(index: number, direction: -1 | 1) {
+    if (!editing) return;
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= editing.images.length) return;
+    const images = [...editing.images];
+    const [item] = images.splice(index, 1);
+    images.splice(nextIndex, 0, item);
+    setEditing({ ...editing, images });
+  }
+
+  function setCoverImage(index: number) {
+    if (!editing || index === 0) return;
+    const images = [...editing.images];
+    const [item] = images.splice(index, 1);
+    images.unshift(item);
+    setEditing({ ...editing, images });
   }
 
   async function save(event: FormEvent) {
@@ -246,6 +266,28 @@ export default function ProjectManager({
               />
             </label>
           ))}
+          <label className="block text-sm md:col-span-1">
+            <span className="font-medium text-slate-700">Before (case strip)</span>
+            <textarea
+              value={editing.before ?? ""}
+              onChange={(event) =>
+                setEditing({ ...editing, before: event.target.value })
+              }
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 min-h-20"
+              placeholder="Problem state before the engagement"
+            />
+          </label>
+          <label className="block text-sm md:col-span-1">
+            <span className="font-medium text-slate-700">After (case strip)</span>
+            <textarea
+              value={editing.after ?? ""}
+              onChange={(event) =>
+                setEditing({ ...editing, after: event.target.value })
+              }
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 min-h-20"
+              placeholder="Shipped surface after the engagement"
+            />
+          </label>
           <label className="block text-sm">
             <span className="font-medium text-slate-700">Status</span>
             <select
@@ -313,7 +355,8 @@ export default function ProjectManager({
               <div>
                 <p className="font-medium text-slate-900">Project images</p>
                 <p className="text-sm text-slate-500">
-                  Upload screenshots directly (JPG, PNG, WebP — max 8MB each).
+                  First image is the cover. Reorder or set cover before saving.
+                  JPG, PNG, WebP — max 8MB each.
                 </p>
               </div>
               <label className="inline-flex items-center gap-2 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 cursor-pointer hover:border-emerald-300">
@@ -333,10 +376,10 @@ export default function ProjectManager({
               </label>
             </div>
             {editing.images.length ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {editing.images.map((image) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {editing.images.map((image, index) => (
                   <div
-                    key={image}
+                    key={`${image}-${index}`}
                     className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-white"
                   >
                     <Image
@@ -346,14 +389,51 @@ export default function ProjectManager({
                       unoptimized
                       className="object-cover"
                     />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(image)}
-                      className="absolute top-2 right-2 rounded-full bg-slate-900/70 text-white p-1"
-                      aria-label="Remove image"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
+                    {index === 0 ? (
+                      <span className="absolute top-2 left-2 rounded-full bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1">
+                        Cover
+                      </span>
+                    ) : null}
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-slate-900/70 p-1.5">
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => moveImage(index, -1)}
+                          disabled={index === 0}
+                          className="rounded-md bg-white/15 text-white p-1 disabled:opacity-30"
+                          aria-label="Move image earlier"
+                        >
+                          <ArrowUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveImage(index, 1)}
+                          disabled={index === editing.images.length - 1}
+                          className="rounded-md bg-white/15 text-white p-1 disabled:opacity-30"
+                          aria-label="Move image later"
+                        >
+                          <ArrowDown className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCoverImage(index)}
+                          disabled={index === 0}
+                          className="rounded-md bg-white/15 text-white p-1 disabled:opacity-30"
+                          aria-label="Set as cover image"
+                          title="Set as cover"
+                        >
+                          <Star className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeImage(image)}
+                        className="rounded-md bg-white/15 text-white p-1"
+                        aria-label="Remove image"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

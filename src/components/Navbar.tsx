@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight, Menu, X } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
 import { getBookingHref, site } from "@/data/site";
+import { track } from "@/lib/track";
 
 const links = [
   { href: "/#services", label: "Services" },
@@ -27,7 +28,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
           <BrandLogo size={36} priority />
-          <span className="font-display font-bold text-xl text-slate-900 tracking-tight">
+          <span className="font-display font-semibold text-xl text-slate-900 tracking-tight">
             {site.name}
           </span>
         </Link>
@@ -44,15 +45,16 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-4">
           <Link
             href="/login"
-            className="px-4 py-2.5 rounded-full text-sm font-medium text-slate-700 border border-slate-200 hover:border-emerald-200 hover:text-emerald-700 transition-colors"
+            className="text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors"
           >
             Login
           </Link>
           <Link
             href={getBookingHref()}
+            onClick={() => track("cta_book_nav")}
             className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm shadow-emerald-200"
           >
             Book a Consultation
@@ -92,12 +94,15 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <Link href="/login" onClick={() => setOpen(false)} className="py-1">
+              <Link href="/login" onClick={() => setOpen(false)} className="py-1 text-slate-500">
                 Login
               </Link>
               <Link
                 href={getBookingHref()}
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false);
+                  track("cta_book_nav_mobile");
+                }}
                 className="inline-flex items-center justify-center gap-2 bg-emerald-500 text-white px-5 py-3 rounded-full"
               >
                 Book a Consultation

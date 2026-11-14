@@ -22,6 +22,8 @@ export function seedProjects(): CmsProject[] {
     approach: project.approach,
     outcome: project.outcome,
     role: project.role,
+    before: project.before,
+    after: project.after,
     quotation: "",
     timeline: project.year,
     partners: [],

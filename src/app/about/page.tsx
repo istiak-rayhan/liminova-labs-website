@@ -57,9 +57,10 @@ export default function AboutPage() {
           for reviews, async for everything else.
         </p>
         <p>
-          The portfolio is intentionally short. B-FRENCH, UrbanRide, and Livira
-          Fashion are production systems, not concept decks. We would rather
-          show three platforms you can inspect than a wall of unnamed logos.
+          The portfolio is intentionally short. B-FRENCH, PrimexN, Prep-Civique,
+          UrbanRide, and Livira Fashion are production systems, not concept
+          decks. We would rather show platforms you can inspect than a wall of
+          unnamed logos.
         </p>
         <p>
           Who we work with: founders and operators who can make a decision in a

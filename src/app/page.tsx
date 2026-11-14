@@ -9,8 +9,11 @@ import Portfolio from "@/components/Portfolio";
 import Testimonials from "@/components/Testimonials";
 import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
+import { getPublishedProjects } from "@/lib/cms";
 
-export default function Home() {
+export default async function Home() {
+  const projects = await getPublishedProjects();
+
   return (
     <>
       <Hero />
@@ -20,7 +23,7 @@ export default function Home() {
       <Industries />
       <Engagement />
       <Process />
-      <Portfolio />
+      <Portfolio projects={projects} />
       <Testimonials />
       <FAQ />
       <Contact />

@@ -8,7 +8,7 @@ export type Service = {
   deliverables: string[];
   timeline: string;
   tags: string[];
-  icon: "code" | "growth" | "ai";
+  icon: "code" | "growth" | "ai" | "staff";
 };
 
 export const services: Service[] = [
@@ -59,21 +59,42 @@ export const services: Service[] = [
     title: "Advanced Tech & AI",
     eyebrow: "Extend",
     summary:
-      "Python tools, REST APIs, and AI features that sit on top of a working product — not a slide deck.",
+      "Python tools, REST APIs, OCR/POS integrations, and AI features that sit on top of a working product.",
     description:
-      "Once the core platform is live, we add the unglamorous leverage: internal tools, integrations, and AI features with a clear job (search, classification, assist). We will not bolt a chatbot onto a product that does not need one.",
+      "Once the core platform is live, we add leverage: internal tools, hardware-aware integrations, and AI features with a clear job (search, classification, assist). We will not bolt a chatbot onto a product that does not need one.",
     audience:
-      "Product teams who have a workflow or dataset and want automation with an API they can own.",
+      "Product teams who have a workflow, dataset, or device stack and want automation with an API they can own.",
     deliverables: [
       "Problem framing and data check",
       "Python services or scripts",
       "REST API design and docs",
-      "AI/ML integration where it earns its keep",
+      "AI/ML or OCR integration where it earns its keep",
       "Handoff with operations notes",
     ],
     timeline: "2–8 weeks for a focused tool or integration.",
-    tags: ["Python", "AI & ML", "REST APIs"],
+    tags: ["Python", "AI & OCR", "REST APIs"],
     icon: "ai",
+  },
+  {
+    slug: "technical-experts",
+    title: "Technical Experts",
+    eyebrow: "Staff",
+    summary:
+      "Agencies and product teams can hire a named Flutter, Next.js, or backend expert from us — embedded, not anonymous bench.",
+    description:
+      "When you need a senior pair of hands inside your squad, we embed a named engineer with clear ownership. Not body shopping: scoped contribution, weekly cadence, and the same delivery bar we use on our own builds.",
+    audience:
+      "Agencies, founders, and product orgs that need skilled capacity without a long hiring cycle.",
+    deliverables: [
+      "Role and stack match",
+      "Named engineer introduction",
+      "Embedded delivery cadence",
+      "Weekly progress notes",
+      "Clean offboarding and handoff",
+    ],
+    timeline: "Typical embedding: 4–12 weeks, extendable.",
+    tags: ["Flutter", "Next.js", "Backend"],
+    icon: "staff",
   },
 ];
 

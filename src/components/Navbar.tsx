@@ -28,7 +28,7 @@ export default function Navbar() {
           <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
             <span className="text-white font-bold text-xl leading-none">L</span>
           </div>
-          <span className="font-bold text-xl text-slate-900 tracking-tight">
+          <span className="font-display font-bold text-xl text-slate-900 tracking-tight">
             {site.name}
           </span>
         </Link>
@@ -45,13 +45,21 @@ export default function Navbar() {
           ))}
         </div>
 
-        <Link
-          href={getBookingHref()}
-          className="hidden md:flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm shadow-emerald-200"
-        >
-          Book a Consultation
-          <ArrowRight className="w-4 h-4" />
-        </Link>
+        <div className="hidden md:flex items-center gap-3">
+          <Link
+            href="/login"
+            className="px-4 py-2.5 rounded-full text-sm font-medium text-slate-700 border border-slate-200 hover:border-emerald-200 hover:text-emerald-700 transition-colors"
+          >
+            Login
+          </Link>
+          <Link
+            href={getBookingHref()}
+            className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm shadow-emerald-200"
+          >
+            Book a Consultation
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
 
         <button
           type="button"
@@ -85,6 +93,9 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <Link href="/login" onClick={() => setOpen(false)} className="py-1">
+                Login
+              </Link>
               <Link
                 href={getBookingHref()}
                 onClick={() => setOpen(false)}

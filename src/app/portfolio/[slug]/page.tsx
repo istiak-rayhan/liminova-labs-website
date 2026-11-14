@@ -2,12 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
-import {
-  getProject,
-  getRelatedProjects,
-  projects,
-} from "@/data/projects";
+import { ArrowLeft, ArrowRight, CheckCircle2, ExternalLink } from "lucide-react";
+import { projects } from "@/data/projects";
+import { getPublishedProject, getPublishedProjects } from "@/lib/cms";
 import { site } from "@/data/site";
 
 type Props = {
@@ -20,7 +17,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProject(slug);
+  const project = await getPublishedProject(slug);
   if (!project) return { title: "Project" };
 
   return {
@@ -35,15 +32,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectDetails({ params }: Props) {
   const { slug } = await params;
-  const project = getProject(slug);
+  const project = await getPublishedProject(slug);
 
   if (!project) notFound();
 
-  const related = getRelatedProjects(project.slug);
+  const all = await getPublishedProjects();
+  const related = all.filter((item) => item.slug !== project.slug).slice(0, 2);
 
   return (
-    <main className="bg-slate-50 pb-24">
-      <div className="bg-white border-b border-slate-200 pt-16 pb-12">
+    <main className="pb-24">
+      <div className="bg-white/80 border-b border-slate-200 pt-16 pb-12">
         <div className="max-w-5xl mx-auto px-6">
           <Link
             href="/portfolio"
@@ -54,14 +52,14 @@ export default async function ProjectDetails({ params }: Props) {
           <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">
             {project.category} · {project.year}
           </p>
-          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-4 tracking-tight">
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold text-slate-900 mb-4 tracking-tight">
             {project.title}
           </h1>
           <p className="text-lg text-slate-500 mb-6">{project.clientLine}</p>
           <p className="text-lg text-slate-600 max-w-3xl leading-relaxed mb-8">
             {project.summary}
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3 mb-6">
             {project.tech.map((tech) => (
               <span
                 key={tech}
@@ -71,6 +69,16 @@ export default async function ProjectDetails({ params }: Props) {
               </span>
             ))}
           </div>
+          {project.liveUrl ? (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 text-emerald-700 font-semibold hover:text-emerald-800"
+            >
+              Open live project <ExternalLink className="w-4 h-4" />
+            </a>
+          ) : null}
         </div>
       </div>
 

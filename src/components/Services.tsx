@@ -14,24 +14,28 @@ const icons = {
 
 const accents = [
   {
-    color: "bg-blue-100 text-blue-600",
-    borderColor: "hover:border-blue-200",
-    shadowColor: "hover:shadow-blue-900/5",
+    tint: "rgba(14,165,233,0.14)",
+    icon: "bg-sky-500/15 text-sky-700 ring-sky-500/20",
+    glow: "group-hover:shadow-sky-500/10",
+    bar: "from-sky-400 to-sky-600",
   },
   {
-    color: "bg-emerald-100 text-emerald-600",
-    borderColor: "hover:border-emerald-200",
-    shadowColor: "hover:shadow-emerald-900/5",
+    tint: "rgba(16,185,129,0.14)",
+    icon: "bg-emerald-500/15 text-emerald-700 ring-emerald-500/20",
+    glow: "group-hover:shadow-emerald-500/10",
+    bar: "from-emerald-400 to-emerald-600",
   },
   {
-    color: "bg-purple-100 text-purple-600",
-    borderColor: "hover:border-purple-200",
-    shadowColor: "hover:shadow-purple-900/5",
+    tint: "rgba(20,184,166,0.14)",
+    icon: "bg-teal-500/15 text-teal-700 ring-teal-500/20",
+    glow: "group-hover:shadow-teal-500/10",
+    bar: "from-teal-400 to-teal-600",
   },
   {
-    color: "bg-amber-100 text-amber-600",
-    borderColor: "hover:border-amber-200",
-    shadowColor: "hover:shadow-amber-900/5",
+    tint: "rgba(245,158,11,0.14)",
+    icon: "bg-amber-500/15 text-amber-700 ring-amber-500/20",
+    glow: "group-hover:shadow-amber-500/10",
+    bar: "from-amber-400 to-amber-600",
   },
 ];
 
@@ -39,14 +43,15 @@ export default function Services() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section id="services" className="py-24 bg-white relative overflow-hidden">
+    <section id="services" className="py-24 relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.08),transparent_45%)]" />
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-20">
+        <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.span
             initial={reduceMotion ? false : { opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-block py-1 px-3 rounded-full bg-slate-100 text-slate-600 text-sm font-bold uppercase tracking-wider mb-4"
+            className="inline-block py-1.5 px-3 rounded-full bg-white/80 border border-emerald-100 text-slate-600 text-xs font-bold uppercase tracking-[0.18em] mb-4"
           >
             What we offer
           </motion.span>
@@ -54,7 +59,7 @@ export default function Services() {
             initial={reduceMotion ? false : { opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight"
+            className="font-display text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight"
           >
             From evaluation to <span className="text-emerald-500">profit.</span>
           </motion.h2>
@@ -70,38 +75,38 @@ export default function Services() {
           </motion.p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-6">
           {services.map((service, index) => {
             const Icon = icons[service.icon];
-            const accent = accents[index];
+            const accent = accents[index % accents.length];
             return (
               <motion.div
                 key={service.slug}
-                initial={reduceMotion ? false : { opacity: 0, y: 30 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`bg-slate-50 rounded-3xl p-8 border border-slate-100 transition-all duration-300 group hover:-translate-y-2 hover:shadow-xl ${accent.borderColor} ${accent.shadowColor} flex flex-col h-full`}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.55, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                style={{ ["--card-tint" as string]: accent.tint }}
+                className={`card-sheen group relative overflow-hidden rounded-[1.75rem] border border-white/80 p-8 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.35)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_28px_60px_-24px_rgba(15,23,42,0.4)] ${accent.glow}`}
               >
+                <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${accent.bar}`} />
                 <div
-                  className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-8 transition-transform group-hover:scale-110 duration-300 ${accent.color}`}
+                  className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-7 ring-1 transition-transform duration-500 group-hover:scale-110 ${accent.icon}`}
                 >
-                  <Icon className="w-8 h-8" />
+                  <Icon className="w-7 h-7" />
                 </div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400 mb-2">
                   {service.eyebrow}
                 </p>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">
+                <h3 className="font-display text-2xl font-bold text-slate-900 mb-4">
                   {service.title}
                 </h3>
-                <p className="text-slate-600 leading-relaxed mb-8 flex-grow">
-                  {service.summary}
-                </p>
+                <p className="text-slate-600 leading-relaxed mb-8">{service.summary}</p>
                 <div className="flex flex-wrap gap-2 mb-8">
                   {service.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 bg-white border border-slate-200 text-slate-600 text-xs font-bold uppercase tracking-wider rounded-md"
+                      className="px-3 py-1 bg-white/80 border border-slate-200/80 text-slate-600 text-[11px] font-bold uppercase tracking-wider rounded-md"
                     >
                       {tag}
                     </span>
@@ -109,9 +114,9 @@ export default function Services() {
                 </div>
                 <Link
                   href={`/services/${service.slug}`}
-                  className="flex items-center gap-2 text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors mt-auto"
+                  className="inline-flex items-center gap-2 text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors"
                 >
-                  Explore capabilities{" "}
+                  Explore capabilities
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </motion.div>

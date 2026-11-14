@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans, Syne } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
+import AppShell from "@/components/AppShell";
 import JsonLd from "@/components/JsonLd";
 import { site } from "@/data/site";
 
-const inter = Inter({
+const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+const display = Syne({
+  subsets: ["latin"],
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -48,7 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${inter.variable} ${inter.className} bg-slate-50 text-slate-900 antialiased selection:bg-emerald-100 selection:text-emerald-900`}
+        className={`${sans.variable} ${display.variable} ${sans.className} bg-slate-50 text-slate-900 antialiased selection:bg-emerald-100 selection:text-emerald-900`}
       >
         <a
           href="#main"
@@ -56,12 +60,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <Navbar />
-        <div id="main" className="pt-20 min-h-screen">
-          {children}
-        </div>
-        <Footer />
-        <WhatsAppButton />
+        <AppShell>{children}</AppShell>
         <JsonLd />
         <Analytics />
       </body>

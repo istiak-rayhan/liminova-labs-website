@@ -19,33 +19,93 @@ export type Project = {
   metrics: ProjectMetric[];
   tech: string[];
   images: string[];
+  liveUrl?: string;
 };
 
 export const projects: Project[] = [
   {
     slug: "bfrench",
     title: "B-FRENCH",
-    clientLine: "Language institute — French learning and civic-exam LMS",
+    clientLine: "Language institute — full learning ecosystem for Bangla speakers in France",
     category: "EdTech / LMS",
     industry: "EdTech",
-    year: "2024",
+    year: "2024–2025",
     featured: true,
     summary:
-      "A cross-platform learning product that puts recorded lessons, live classes, civic-exam prep, and payments in one learner app.",
+      "A complete custom-built ecosystem: learner web app, Flutter mobile, and a 4-role dashboard covering courses, enrollments, exams, and operations.",
     challenge:
-      "The institute needed one product for French language and civic-exam preparation in Bengali — not a generic course marketplace. Learners had to move between pre-recorded lessons, live Zoom sessions, practice, and payment without leaving the app.",
+      "The institute needed one product for French language and civic-exam preparation — not a generic course marketplace. Learners, instructors, and admins each needed a real surface: catalog, live Zoom entry, practice, payments, and back-office control.",
     approach:
-      "We scoped the product around two learning tracks, then engineered a Flutter client with a Node.js API for catalog, progress, live-session entry, and payment. UI/UX stayed dark and focused so the academic content — not chrome — led the experience.",
+      "We engineered a full stack: a dark-mode Next.js learner web app, Flutter mobile clients, and a multi-role admin (overview, users, courses, enrollments, gradebook, exam banks, site content). Live sessions, recorded catalogs, and progress share one product model.",
     outcome:
-      "A production LMS that combines live and recorded learning, in-app payments, and course tracking for a language institute. The same codebase ships on iOS and Android.",
-    role: "Product design and platform engineering",
+      "A production LMS ecosystem live at b-french-web — web, mobile, and operations in one accountable build instead of bolted-together tools.",
+    role: "Product design and full-stack platform engineering",
     metrics: [
-      { value: "2", label: "Learning tracks in one app" },
-      { value: "Live + recorded", label: "Lesson formats shipped" },
-      { value: "In-app", label: "Payments and progress" },
+      { value: "4", label: "Dashboard roles shipped" },
+      { value: "Web + mobile", label: "Learner surfaces" },
+      { value: "Live + recorded", label: "Lesson formats" },
     ],
-    tech: ["Flutter", "Node.js", "REST API", "Payment Gateway", "UI/UX"],
-    images: ["/projects/bfrench2.jpg", "/projects/bfrench3.jpg"],
+    tech: ["Next.js", "Flutter", "Node.js", "REST API", "Payment Gateway"],
+    images: [
+      "/projects/bfrench-web.png",
+      "/projects/bfrench-admin.png",
+      "/projects/bfrench2.jpg",
+      "/projects/bfrench3.jpg",
+    ],
+    liveUrl: "https://b-french-web.vercel.app/en",
+  },
+  {
+    slug: "primexn",
+    title: "PrimexN",
+    clientLine: "France-based business — warehouse inventory operations",
+    category: "SaaS / Inventory",
+    industry: "SaaS",
+    year: "2025",
+    featured: false,
+    summary:
+      "Warehouse inventory management software for receiving, issuing, products, suppliers, documents, and stock movements — built for French operations.",
+    challenge:
+      "Operators needed a single workspace for stock availability, receive/issue actions, invoices, wastage, and supplier/customer records without juggling spreadsheets.",
+    approach:
+      "We shipped an operations dashboard with overview KPIs, quick actions, product/customer/supplier modules, stock movements, and expense tracking — structured for day-to-day warehouse workflows.",
+    outcome:
+      "A production inventory SaaS live at primexn.fr, giving the business a dedicated operations workspace instead of ad-hoc tooling.",
+    role: "Product engineering and operations UI",
+    metrics: [
+      { value: "EUR", label: "Ops workspace for FR business" },
+      { value: "Stock + docs", label: "Receive, issue, invoices" },
+      { value: "Live", label: "primexn.fr in production" },
+    ],
+    tech: ["Next.js", "TypeScript", "Dashboard UX", "Inventory workflows"],
+    images: ["/projects/primexn.png"],
+    liveUrl: "https://primexn.fr/",
+  },
+  {
+    slug: "prepcivic",
+    title: "Prep-Civique",
+    clientLine: "Torc Digital — French civic / naturalization exam prep",
+    category: "EdTech / Mobile",
+    industry: "EdTech",
+    year: "2024",
+    featured: false,
+    summary:
+      "French civic exam preparation app with practice themes, timed mock exams, multilingual support, and progress stats — live on Google Play.",
+    challenge:
+      "Torc Digital needed a mobile product for naturalization exam prep: themed practice, mock tests, statistics, and language support for candidates who are not yet fluent in French UI alone.",
+    approach:
+      "We built Prep-Civique around practice modules (Republic, history, values, institutions, society), timed 40-question mocks, candidate stats, and referral/premium paths — then shipped to Play Store under Torc Digital.",
+    outcome:
+      "A live Play Store app (com.torcdigital.prepcivique) candidates can install for structured civic exam preparation.",
+    role: "Mobile product engineering",
+    metrics: [
+      { value: "Play Store", label: "Live consumer app" },
+      { value: "40 Q", label: "Timed mock exams" },
+      { value: "Multi-lang", label: "Practice for diverse candidates" },
+    ],
+    tech: ["Flutter", "Mobile UX", "Exam engine", "Play Store"],
+    images: ["/projects/prepcivic1.png", "/projects/prepcivic2.png"],
+    liveUrl:
+      "https://play.google.com/store/apps/details?id=com.torcdigital.prepcivique&hl=en",
   },
   {
     slug: "urbanride",

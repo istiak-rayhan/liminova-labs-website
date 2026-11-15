@@ -8,6 +8,41 @@ export type ProjectTask = {
   done: boolean;
 };
 
+export type ProjectPhase = {
+  id: string;
+  name: string;
+  value: number;
+};
+
+export type ProjectReceipt = {
+  id: string;
+  amount: number;
+  date: string;
+  note: string;
+};
+
+export type ProjectShare = {
+  memberId: string;
+  percent: number;
+};
+
+export type CmsPayout = {
+  id: string;
+  projectId: string;
+  memberId: string;
+  amount: number;
+  date: string;
+  note: string;
+};
+
+export type CmsInvestment = {
+  id: string;
+  section: string;
+  amount: number;
+  date: string;
+  note: string;
+};
+
 export type CmsProject = {
   id: string;
   slug: string;
@@ -27,8 +62,15 @@ export type CmsProject = {
   before?: string;
   after?: string;
   quotation: string;
-  /** Optional commercial value in USD, used only in the private dashboard. */
+  /** Client company. Private. Not shown on the public site. */
+  company?: string;
+  /** Signed contract value in USD. */
+  finalizedValue?: number;
+  /** @deprecated mirror of finalizedValue for older saves */
   dealValue?: number;
+  phases?: ProjectPhase[];
+  receipts?: ProjectReceipt[];
+  shares?: ProjectShare[];
   nextAction?: string;
   tasks?: ProjectTask[];
   timeline: string;
@@ -73,5 +115,7 @@ export type CmsStore = {
   projects: CmsProject[];
   team: CmsTeamMember[];
   leads: CmsLead[];
+  payouts: CmsPayout[];
+  investments: CmsInvestment[];
   updatedAt: string;
 };

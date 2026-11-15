@@ -25,7 +25,12 @@ export function seedProjects(): CmsProject[] {
     before: project.before,
     after: project.after,
     quotation: "",
+    company: "",
+    finalizedValue: undefined,
     dealValue: undefined,
+    phases: [],
+    receipts: [],
+    shares: [],
     nextAction: "",
     tasks: [],
     timeline: project.year,
@@ -61,6 +66,8 @@ export function createSeedStore(): CmsStore {
     projects: seedProjects(),
     team: seedTeam(),
     leads: [],
+    payouts: [],
+    investments: [],
     updatedAt: now(),
   };
 }

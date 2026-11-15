@@ -13,5 +13,5 @@ export default async function AdminProjectsPage({ searchParams }: Props) {
     ? (params.status as ProjectStatus)
     : undefined;
 
-  return <ProjectManager initialProjects={store.projects} filter={status} />;
+  return <ProjectManager initialProjects={store.projects} team={store.team} filter={status} />;
 }

@@ -1,14 +1,7 @@
 import Link from "next/link";
 import { getCmsStore } from "@/lib/cms";
-import { buildReport, leadStages } from "@/lib/report";
-
-function money(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
+import { money } from "@/lib/finance";
+import { buildReport, leadStages, statusLabels } from "@/lib/report";
 
 export default async function AdminReportsPage() {
   const store = await getCmsStore();
@@ -26,15 +19,47 @@ export default async function AdminReportsPage() {
       </div>
 
       <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <Stat label="Earned so far" value={money(report.earned)} hint="Receipts recorded on projects" />
+        <Stat label="This month" value={money(report.monthIncome)} hint="Receipts dated this month, Dhaka time" />
+        <Stat label="Last 7 days" value={money(report.weekIncome)} hint="Receipts from the last 7 days" />
+        <Stat label="Still in the pipeline" value={money(report.pipelineRemaining)} hint="Remaining on work that is not completed" />
         <Stat label="Briefs, last 30 days" value={String(report.last30)} hint={`${report.prev30} in the 30 days before`} />
-        <Stat label="Open pipeline value" value={money(report.pipelineValue)} hint="Sum of deal value on pipeline and ongoing work" />
         <Stat
           label="Win rate"
           value={report.winRate === null ? "—" : `${Math.round(report.winRate * 100)}%`}
           hint="Won divided by won + lost"
         />
-        <Stat label="Live case studies" value={String(report.published)} hint="Completed and published" />
+        <Stat label="Shown on the website" value={String(report.published)} hint="Projects with showcase turned on" />
+        <Stat label="Still to collect" value={money(report.toCollect)} hint="Finalized value minus receipts, all projects" />
       </div>
+
+      <section className="rounded-2xl bg-white border border-slate-200 p-6 overflow-x-auto">
+        <h2 className="font-semibold text-slate-900 mb-4">Money by project</h2>
+        <table className="w-full text-sm">
+          <thead className="text-left text-slate-500">
+            <tr>
+              <th className="py-2 pr-3 font-semibold">Project</th>
+              <th className="py-2 pr-3 font-semibold">Company</th>
+              <th className="py-2 pr-3 font-semibold">Status</th>
+              <th className="py-2 pr-3 font-semibold">Finalized</th>
+              <th className="py-2 pr-3 font-semibold">Received</th>
+              <th className="py-2 font-semibold">Remaining</th>
+            </tr>
+          </thead>
+          <tbody>
+            {report.projectMoney.map((row) => (
+              <tr key={row.id} className="border-t border-slate-100">
+                <td className="py-3 pr-3 font-medium text-slate-900">{row.title}</td>
+                <td className="py-3 pr-3 text-slate-600">{row.company}</td>
+                <td className="py-3 pr-3">{statusLabels[row.status]}</td>
+                <td className="py-3 pr-3">{money(row.finalized)}</td>
+                <td className="py-3 pr-3">{money(row.received)}</td>
+                <td className="py-3">{money(row.remaining)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
 
       <section className="rounded-2xl bg-white border border-slate-200 p-6">
         <h2 className="font-semibold text-slate-900 mb-4">Lead pipeline</h2>

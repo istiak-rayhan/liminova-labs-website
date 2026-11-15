@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
-import { projects } from "@/data/projects";
+import { getPublishedProjects } from "@/lib/cms";
 import { services } from "@/data/services";
 import { site } from "@/data/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticRoutes = [
@@ -24,7 +24,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
-  const projectRoutes = projects.map((project) => ({
+  const published = await getPublishedProjects();
+  const projectRoutes = published.map((project) => ({
     url: `${site.url}/portfolio/${project.slug}`,
     lastModified: now,
     changeFrequency: "monthly" as const,

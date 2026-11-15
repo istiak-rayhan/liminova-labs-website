@@ -11,7 +11,7 @@ const listing = {
   email: site.email,
   area: "Dhaka, Bangladesh — serving clients worldwide",
   description:
-    "Liminova Labs designs and ships Flutter and Next.js products, then grows them with SEO and Meta Ads. Dhaka-based studio for founders, operators, and agencies that need a named technical partner.",
+    "Liminova Labs is a digital transformation partner in Dhaka. We design, ship, and grow product platforms for founders, operators, and agencies.",
 };
 
 export default function AdminSearchPage() {

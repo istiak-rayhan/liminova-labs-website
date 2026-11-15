@@ -10,9 +10,9 @@ export const site = {
   linkedin: process.env.NEXT_PUBLIC_LINKEDIN_URL ?? "",
   fiverr: process.env.NEXT_PUBLIC_FIVERR_URL ?? "",
   upwork: process.env.NEXT_PUBLIC_UPWORK_URL ?? "",
-  title: "Liminova Labs | Flutter & Next.js Studio in Dhaka",
+  title: "Liminova Labs | Digital Transformation Partner in Dhaka",
   description:
-    "Dhaka-based studio for Flutter app development, Next.js platforms, custom LMS products, SEO, and Meta Ads. We design, ship, and grow the product — for founders and agencies worldwide.",
+    "Digital transformation partner in Dhaka. Liminova Labs designs, ships, and grows product platforms for founders and agencies worldwide.",
   keywords: [
     "Flutter app development Dhaka",
     "Next.js development agency",

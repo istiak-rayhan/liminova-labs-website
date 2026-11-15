@@ -67,7 +67,7 @@ export default function OpenGraphImage() {
             We design, ship, and grow product platforms.
           </div>
           <div style={{ fontSize: 28, color: "#475569" }}>
-            Flutter · Next.js · Growth · Embedded experts · Dhaka, serving globally
+            Digital transformation partner in Dhaka, serving globally
           </div>
         </div>
       </div>

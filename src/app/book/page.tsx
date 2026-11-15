@@ -7,6 +7,8 @@ import { site } from "@/data/site";
 import { pageMetadata } from "@/lib/seo";
 import { upcomingSlots } from "@/lib/slots";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = pageMetadata(
   "/book",
   "Book a consultation",

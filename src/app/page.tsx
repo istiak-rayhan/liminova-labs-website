@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Hero from "@/components/Hero";
 import TechMarquee from "@/components/TechMarquee";
 import ProofStrip from "@/components/ProofStrip";
@@ -11,7 +12,12 @@ import Portfolio from "@/components/Portfolio";
 import Testimonials from "@/components/Testimonials";
 import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
+import { homepageFaqs } from "@/data/faqs";
 import { getPublishedProjects } from "@/lib/cms";
+import { site } from "@/data/site";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata("/", site.title, site.description);
 
 export default async function Home() {
   const projects = await getPublishedProjects();
@@ -31,6 +37,20 @@ export default async function Home() {
       <Testimonials />
       <FAQ />
       <Contact />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: homepageFaqs.map((faq) => ({
+              "@type": "Question",
+              name: faq.question,
+              acceptedAnswer: { "@type": "Answer", text: faq.answer },
+            })),
+          }),
+        }}
+      />
     </>
   );
 }

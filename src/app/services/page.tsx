@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import StartHere from "@/components/StartHere";
 import { services } from "@/data/services";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Services",
-  description:
-    "Platform engineering, brand and growth marketing, applied AI, and embedded technical experts — pick a lane or start with a brief.",
-};
+export const metadata: Metadata = pageMetadata(
+  "/services",
+  "Services",
+  "Flutter and Next.js development, custom LMS builds, SEO, Meta Ads, AI integrations, and embedded engineers from Liminova Labs in Dhaka.",
+);
 
 export default function ServicesIndexPage() {
   return (

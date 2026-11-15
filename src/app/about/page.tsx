@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { site } from "@/data/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "About",
-  description:
-    "Liminova Labs is a Dhaka-based digital transformation partner. We evaluate, build, and grow product platforms — then stop when the work is not honest.",
-};
+export const metadata: Metadata = pageMetadata(
+  "/about",
+  "About",
+  "Liminova Labs is a Dhaka software studio. We build Flutter apps, Next.js platforms, and LMS products, then grow them with SEO and Meta Ads.",
+);
 
 const principles = [
   {

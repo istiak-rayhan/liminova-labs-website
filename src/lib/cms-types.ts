@@ -1,5 +1,13 @@
 export type ProjectStatus = "pipeline" | "ongoing" | "completed";
 
+export type LeadStage = "new" | "contacted" | "call" | "proposal" | "won" | "lost";
+
+export type ProjectTask = {
+  id: string;
+  title: string;
+  done: boolean;
+};
+
 export type CmsProject = {
   id: string;
   slug: string;
@@ -19,6 +27,10 @@ export type CmsProject = {
   before?: string;
   after?: string;
   quotation: string;
+  /** Optional commercial value in USD, used only in the private dashboard. */
+  dealValue?: number;
+  nextAction?: string;
+  tasks?: ProjectTask[];
   timeline: string;
   partners: string[];
   metrics: { label: string; value: string }[];
@@ -41,9 +53,25 @@ export type CmsTeamMember = {
   updatedAt: string;
 };
 
+export type CmsLead = {
+  id: string;
+  name: string;
+  email: string;
+  company: string;
+  projectType: string;
+  budget: string;
+  timeline: string;
+  message: string;
+  stage: LeadStage;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type CmsStore = {
   version: 1;
   projects: CmsProject[];
   team: CmsTeamMember[];
+  leads: CmsLead[];
   updatedAt: string;
 };

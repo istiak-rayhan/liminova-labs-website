@@ -25,6 +25,9 @@ export function seedProjects(): CmsProject[] {
     before: project.before,
     after: project.after,
     quotation: "",
+    dealValue: undefined,
+    nextAction: "",
+    tasks: [],
     timeline: project.year,
     partners: [],
     metrics: project.metrics,
@@ -57,6 +60,7 @@ export function createSeedStore(): CmsStore {
     version: 1,
     projects: seedProjects(),
     team: seedTeam(),
+    leads: [],
     updatedAt: now(),
   };
 }

@@ -1,69 +1,87 @@
 import Link from "next/link";
 import { getCmsStore } from "@/lib/cms";
+import { buildReport } from "@/lib/report";
 
 export default async function AdminOverviewPage() {
   const store = await getCmsStore();
-  const counts = {
-    pipeline: store.projects.filter((p) => p.status === "pipeline").length,
-    ongoing: store.projects.filter((p) => p.status === "ongoing").length,
-    completed: store.projects.filter((p) => p.status === "completed").length,
-    published: store.projects.filter((p) => p.published && p.status === "completed")
-      .length,
-    team: store.team.filter((member) => member.active).length,
-  };
+  const report = buildReport(store);
+  const team = store.team.filter((member) => member.active).length;
 
   const cards = [
-    { label: "Pipeline", value: counts.pipeline, href: "/admin/projects?status=pipeline" },
-    { label: "Ongoing", value: counts.ongoing, href: "/admin/projects?status=ongoing" },
-    { label: "Completed", value: counts.completed, href: "/admin/projects?status=completed" },
-    { label: "Live on site", value: counts.published, href: "/portfolio" },
-    { label: "Active team", value: counts.team, href: "/admin/team" },
+    { label: "New briefs", value: report.byStage.new, href: "/admin/leads" },
+    { label: "Briefs, 30 days", value: report.last30, href: "/admin/reports" },
+    { label: "Pipeline", value: report.byStatus.pipeline, href: "/admin/projects?status=pipeline" },
+    { label: "Ongoing", value: report.byStatus.ongoing, href: "/admin/projects?status=ongoing" },
+    { label: "Live on site", value: report.published, href: "/portfolio" },
+    { label: "Active team", value: team, href: "/admin/team" },
   ];
 
   return (
     <div>
-      <h1 className="font-display text-3xl font-bold text-slate-900 mb-2">
-        Dashboard
-      </h1>
+      <h1 className="font-display text-3xl font-bold text-slate-900 mb-2">Dashboard</h1>
       <p className="text-slate-500 mb-8">
-        Manage delivery inventory, publish completed work to Selected work, and
-        keep the team roster current.
+        Briefs, delivery, and what is published. Figures are from this studio only.
       </p>
-      <div className="grid sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-10">
+      <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
         {cards.map((card) => (
           <Link
             key={card.label}
             href={card.href}
             className="rounded-2xl bg-white border border-slate-200 p-5 hover:border-emerald-200 hover:shadow-md transition-all"
           >
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              {card.label}
-            </p>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{card.label}</p>
             <p className="text-3xl font-extrabold text-slate-900 mt-2">{card.value}</p>
           </Link>
         ))}
       </div>
-      <div className="rounded-2xl bg-white border border-slate-200 p-6">
-        <h2 className="font-semibold text-slate-900 mb-2">Quick actions</h2>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/admin/projects"
-            className="rounded-full bg-emerald-500 text-white px-4 py-2 text-sm font-semibold"
-          >
-            Add / edit projects
-          </Link>
-          <Link
-            href="/admin/team"
-            className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700"
-          >
-            Manage team
-          </Link>
-        </div>
-        <p className="text-sm text-slate-500 mt-4">
-          Mark a project <strong>completed</strong> and toggle{" "}
-          <strong>published</strong> to showcase it on the landing page Selected
-          work section.
-        </p>
+
+      <div className="grid lg:grid-cols-2 gap-4">
+        <section className="rounded-2xl bg-white border border-slate-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-slate-900">Latest briefs</h2>
+            <Link href="/admin/leads" className="text-sm font-semibold text-emerald-700">
+              Open pipeline
+            </Link>
+          </div>
+          {report.recentLeads.length === 0 ? (
+            <p className="text-sm text-slate-500">No briefs yet.</p>
+          ) : (
+            <ul className="divide-y divide-slate-100">
+              {report.recentLeads.map((lead) => (
+                <li key={lead.id} className="py-3">
+                  <p className="font-medium text-slate-900">
+                    {lead.name} · {lead.company}
+                  </p>
+                  <p className="text-sm text-slate-500">
+                    {lead.projectType} · {lead.stage}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+        <section className="rounded-2xl bg-white border border-slate-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-slate-900">Needs a next step</h2>
+            <Link href="/admin/reports" className="text-sm font-semibold text-emerald-700">
+              Full report
+            </Link>
+          </div>
+          {report.nextActions.length === 0 ? (
+            <p className="text-sm text-slate-500">
+              Set a next action on a pipeline or ongoing project.
+            </p>
+          ) : (
+            <ul className="space-y-3">
+              {report.nextActions.slice(0, 5).map((item) => (
+                <li key={item.id}>
+                  <p className="font-medium text-slate-900">{item.title}</p>
+                  <p className="text-sm text-slate-500">{item.nextAction}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
     </div>
   );

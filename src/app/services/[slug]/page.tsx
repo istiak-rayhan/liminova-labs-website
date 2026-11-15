@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getService, services } from "@/data/services";
 import { site } from "@/data/site";
+import { pageMetadata } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -16,10 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const service = getService(slug);
   if (!service) return { title: "Service" };
-  return {
-    title: service.title,
-    description: service.summary,
-  };
+  return pageMetadata(`/services/${service.slug}`, service.seoTitle, service.seoDescription);
 }
 
 export default async function ServicePage({ params }: Props) {
@@ -77,6 +75,20 @@ export default async function ServicePage({ params }: Props) {
         </Link>
         <p className="text-sm text-slate-500 mt-4">{site.responseSla}</p>
       </div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            name: service.seoTitle,
+            description: service.seoDescription,
+            url: `${site.url}/services/${service.slug}`,
+            provider: { "@type": "Organization", name: site.name, url: site.url },
+            areaServed: "Worldwide",
+          }),
+        }}
+      />
     </main>
   );
 }

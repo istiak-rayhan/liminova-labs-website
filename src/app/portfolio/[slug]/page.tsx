@@ -24,9 +24,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: project.title,
     description: project.summary,
+    alternates: { canonical: `/portfolio/${project.slug}` },
     openGraph: {
       title: `${project.title} | ${site.name}`,
       description: project.summary,
+      url: `/portfolio/${project.slug}`,
     },
   };
 }

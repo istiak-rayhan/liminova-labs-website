@@ -9,6 +9,8 @@ export type Service = {
   timeline: string;
   tags: string[];
   icon: "code" | "growth" | "ai" | "people";
+  seoTitle: string;
+  seoDescription: string;
 };
 
 export const services: Service[] = [
@@ -32,6 +34,9 @@ export const services: Service[] = [
     timeline: "Typical build: 6–16 weeks depending on scope.",
     tags: ["Flutter & Dart", "Next.js", "Node.js"],
     icon: "code",
+    seoTitle: "Flutter and Next.js Development",
+    seoDescription:
+      "Liminova Labs builds Flutter apps, Next.js platforms, admin tools, and custom LMS products for teams that need one studio, not a pile of vendors. Based in Dhaka, working worldwide.",
   },
   {
     slug: "brand-growth",
@@ -53,6 +58,9 @@ export const services: Service[] = [
     timeline: "Sprints of 30 days; retainers once the channel is proven.",
     tags: ["Meta Ads", "SEO", "Social Media"],
     icon: "growth",
+    seoTitle: "SEO and Meta Ads",
+    seoDescription:
+      "SEO, social, and Meta Ads for product teams — only after the platform can convert. Liminova Labs ties acquisition to the product that was actually shipped.",
   },
   {
     slug: "advanced-tech-ai",
@@ -74,6 +82,9 @@ export const services: Service[] = [
     timeline: "2–8 weeks for a focused tool or integration.",
     tags: ["Python", "AI & OCR", "REST APIs"],
     icon: "ai",
+    seoTitle: "AI, OCR, and API Integrations",
+    seoDescription:
+      "Python tools, REST APIs, OCR, POS, and practical AI features added to a working product. Liminova Labs builds the integration and hands it over.",
   },
   {
     slug: "technical-experts",
@@ -95,6 +106,9 @@ export const services: Service[] = [
     timeline: "Typical embedding: 4–12 weeks, part-time or full-time.",
     tags: ["Flutter", "Next.js", "Embedded"],
     icon: "people",
+    seoTitle: "Hire a Flutter or Next.js Developer",
+    seoDescription:
+      "Hire a named Flutter, Next.js, or backend engineer from Liminova Labs. Embedded in your squad, with a real person and overlap hours — not an anonymous bench.",
   },
 ];
 

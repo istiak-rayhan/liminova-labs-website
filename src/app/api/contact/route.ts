@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { contactSchema } from "@/lib/contact-schema";
+import { createLead } from "@/lib/cms";
 import { rateLimit } from "@/lib/rate-limit";
 import { site } from "@/data/site";
 
@@ -32,6 +33,16 @@ export async function POST(request: Request) {
     }
 
     const data = parsed.data;
+
+    await createLead({
+      name: data.name,
+      email: data.email,
+      company: data.company,
+      projectType: data.projectType,
+      budget: data.budget,
+      timeline: data.timeline,
+      message: data.message,
+    });
 
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.error("Contact form missing EMAIL_USER or EMAIL_PASS");

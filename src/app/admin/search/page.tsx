@@ -1,4 +1,5 @@
 import { site } from "@/data/site";
+import { requireArea } from "@/lib/guard";
 
 const verified = Boolean(process.env.GOOGLE_SITE_VERIFICATION);
 
@@ -14,7 +15,8 @@ const listing = {
     "Liminova Labs is a digital transformation partner in Dhaka. We design, ship, and grow product platforms for founders, operators, and agencies.",
 };
 
-export default function AdminSearchPage() {
+export default async function AdminSearchPage() {
+  await requireArea("search");
   return (
     <div className="space-y-8 max-w-3xl">
       <div>

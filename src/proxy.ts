@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
+import { normalizeRole } from "@/lib/access";
 import { ADMIN_COOKIE } from "@/lib/auth";
 
 export async function proxy(request: NextRequest) {
@@ -20,7 +21,7 @@ export async function proxy(request: NextRequest) {
       token,
       new TextEncoder().encode(secret),
     );
-    if (payload.role !== "admin") {
+    if (!normalizeRole(payload.role)) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
     return NextResponse.next();

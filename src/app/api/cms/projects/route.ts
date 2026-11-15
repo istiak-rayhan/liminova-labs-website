@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { canEditOwnTasks, canManageProjects } from "@/lib/access";
 import { getAdminSession } from "@/lib/auth";
-import { deleteProject, upsertProject } from "@/lib/cms";
+import { deleteProject, getCmsStore, upsertProject } from "@/lib/cms";
 import type { CmsProject } from "@/lib/cms-types";
 
 export async function POST(request: Request) {
@@ -13,8 +14,26 @@ export async function POST(request: Request) {
     if (!body.id || !body.title) {
       return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
     }
+    if (canManageProjects(session.role)) {
+      const saved = await upsertProject({
+        ...body,
+        updatedAt: new Date().toISOString(),
+      });
+      return NextResponse.json(saved);
+    }
+    if (!canEditOwnTasks(session.role) || !session.memberId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const store = await getCmsStore();
+    const existing = store.projects.find((project) => project.id === body.id);
+    const assigned = existing?.shares?.some((share) => share.memberId === session.memberId);
+    if (!existing || !assigned) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const saved = await upsertProject({
-      ...body,
+      ...existing,
+      nextAction: body.nextAction ?? existing.nextAction,
+      tasks: Array.isArray(body.tasks) ? body.tasks : existing.tasks,
       updatedAt: new Date().toISOString(),
     });
     return NextResponse.json(saved);
@@ -25,7 +44,7 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   const session = await getAdminSession();
-  if (!session) {
+  if (!session || !canManageProjects(session.role)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const id = new URL(request.url).searchParams.get("id");

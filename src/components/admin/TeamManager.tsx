@@ -2,29 +2,23 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { CmsTeamMember, TeamRole } from "@/lib/cms-types";
-
-const roles: TeamRole[] = ["developer", "partner", "operations", "leadership"];
-
-const roleLabels: Record<TeamRole, string> = {
-  developer: "Developer",
-  partner: "Partner",
-  operations: "Operations",
-  leadership: "Leadership",
-};
+import { roleAccess, roleLabels, roleOrder } from "@/lib/access";
+import type { PublicTeamMember, TeamRole } from "@/lib/cms-types";
 
 export default function TeamManager({
   initialTeam,
 }: {
-  initialTeam: CmsTeamMember[];
+  initialTeam: PublicTeamMember[];
 }) {
   const router = useRouter();
   const [team, setTeam] = useState(initialTeam);
-  const [editing, setEditing] = useState<CmsTeamMember | null>(null);
+  const [editing, setEditing] = useState<PublicTeamMember | null>(null);
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
   function startCreate() {
+    setPassword("");
     setEditing({
       id: `team_${Date.now().toString(36)}`,
       name: "",
@@ -32,8 +26,15 @@ export default function TeamManager({
       title: "",
       focus: "",
       active: true,
+      email: "",
+      hasLogin: false,
       updatedAt: new Date().toISOString(),
     });
+  }
+
+  function startEdit(member: PublicTeamMember) {
+    setPassword("");
+    setEditing(member);
   }
 
   async function save(event: FormEvent) {
@@ -45,14 +46,14 @@ export default function TeamManager({
       const response = await fetch("/api/cms/team", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editing),
+        body: JSON.stringify({ ...editing, password: password.trim() || undefined }),
       });
       if (!response.ok) {
         const data = (await response.json()) as { error?: string };
         setError(data.error ?? "Save failed.");
         return;
       }
-      const saved = (await response.json()) as CmsTeamMember;
+      const saved = (await response.json()) as PublicTeamMember;
       setTeam((current) => {
         const index = current.findIndex((member) => member.id === saved.id);
         if (index >= 0) {
@@ -63,6 +64,7 @@ export default function TeamManager({
         return [saved, ...current];
       });
       setEditing(null);
+      setPassword("");
       router.refresh();
     } catch {
       setError("Could not save teammate.");
@@ -87,7 +89,7 @@ export default function TeamManager({
         <div>
           <h1 className="font-display text-3xl font-bold text-slate-900">Team</h1>
           <p className="text-slate-500 mt-1">
-            Developers, partners, and operators working with Liminova Labs.
+            Leadership sets each person’s role, email, and password. Leadership is above operations, then partner, then developer.
           </p>
         </div>
         <button
@@ -135,12 +137,35 @@ export default function TeamManager({
               }
               className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
             >
-              {roles.map((role) => (
+              {roleOrder.map((role) => (
                 <option key={role} value={role}>
                   {roleLabels[role]}
                 </option>
               ))}
             </select>
+            <span className="mt-1 block text-xs text-slate-500">{roleAccess[editing.role]}</span>
+          </label>
+          <label className="block text-sm">
+            <span className="font-medium text-slate-700">Login email</span>
+            <input
+              type="email"
+              value={editing.email ?? ""}
+              onChange={(event) => setEditing({ ...editing, email: event.target.value })}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              placeholder="name@company.com"
+              autoComplete="off"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="font-medium text-slate-700">Password</span>
+            <input
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              placeholder={editing.hasLogin ? "Leave blank to keep the current password" : "At least 8 characters"}
+              autoComplete="new-password"
+            />
           </label>
           <label className="inline-flex items-center gap-2 text-sm pt-7">
             <input
@@ -206,10 +231,14 @@ export default function TeamManager({
               </span>
             </div>
             <p className="text-sm text-slate-600 mt-3">{member.focus}</p>
+            <p className="text-sm text-slate-500 mt-2">
+              {member.email ? member.email : "No login email"}
+              {member.hasLogin ? " · password set" : ""}
+            </p>
             <div className="mt-4 flex gap-3">
               <button
                 type="button"
-                onClick={() => setEditing(member)}
+                onClick={() => startEdit(member)}
                 className="text-emerald-700 text-sm font-semibold"
               >
                 Edit

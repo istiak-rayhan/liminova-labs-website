@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { canEditLeads, canManageTeam } from "@/lib/access";
 import { getAdminSession } from "@/lib/auth";
 import { deleteLead, updateLead } from "@/lib/cms";
 import type { LeadStage } from "@/lib/cms-types";
@@ -7,7 +8,7 @@ const stages = new Set<LeadStage>(["new", "contacted", "call", "proposal", "won"
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
-  if (!session) {
+  if (!session || !canEditLeads(session.role)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   const session = await getAdminSession();
-  if (!session) {
+  if (!session || !canManageTeam(session.role)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const id = new URL(request.url).searchParams.get("id");

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import BookingCalendar from "@/components/BookingCalendar";
 import BookingSteps from "@/components/BookingSteps";
 import TrackLink from "@/components/TrackLink";
 import { site } from "@/data/site";
 import { pageMetadata } from "@/lib/seo";
+import { upcomingSlots } from "@/lib/slots";
 
 export const metadata: Metadata = pageMetadata(
   "/book",
@@ -12,7 +14,7 @@ export const metadata: Metadata = pageMetadata(
 );
 
 export default function BookPage() {
-  const calendly = site.calendly;
+  const slots = upcomingSlots();
 
   return (
     <main className="bg-white pb-24">
@@ -29,40 +31,11 @@ export default function BookPage() {
 
         <BookingSteps />
 
-        {calendly ? (
-          <div className="mt-10 rounded-3xl overflow-hidden border border-slate-200 min-h-[720px] bg-slate-50">
-            <iframe
-              src={calendly}
-              title="Schedule a consultation with Liminova Labs"
-              className="w-full min-h-[720px]"
-            />
-          </div>
-        ) : (
-          <div className="mt-10 rounded-3xl border border-slate-100 bg-slate-50 p-8 md:p-10">
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
-              Write first. We will find a time.
-            </h2>
-            <p className="text-slate-600 leading-relaxed mb-6">
-              Email a short brief or use the form. We will reply with a slot that
-              overlaps your timezone.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <a
-                href={`mailto:${site.email}?subject=Consultation%20with%20Liminova%20Labs`}
-                className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-medium"
-              >
-                Email {site.email}
-              </a>
-              <TrackLink
-                href="/#contact"
-                event="cta_brief_book_page"
-                className="px-6 py-3 bg-white border border-slate-200 rounded-full font-medium text-slate-700"
-              >
-                Send a brief
-              </TrackLink>
-            </div>
-          </div>
-        )}
+        <div className="mt-10 rounded-3xl border border-slate-100 bg-slate-50 p-6 md:p-8">
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Pick a time.</h2>
+          <p className="text-slate-600 mb-6">Weekdays, 10:00–16:30 Dhaka. We hold the slot and confirm by email.</p>
+          <BookingCalendar slots={slots} />
+        </div>
 
         <div className="mt-10 rounded-3xl border border-emerald-100 bg-emerald-50/50 p-6 md:p-8">
           <h2 className="text-xl font-bold text-slate-900 mb-2">

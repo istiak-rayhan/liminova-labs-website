@@ -221,14 +221,17 @@ export function newTeamId() {
 }
 
 export async function createLead(
-  input: Omit<CmsLead, "id" | "stage" | "notes" | "createdAt" | "updatedAt">,
+  input: Omit<CmsLead, "id" | "notes" | "createdAt" | "updatedAt" | "stage"> & {
+    stage?: CmsLead["stage"];
+  },
 ) {
   const store = await getCmsStore();
   const stamped = new Date().toISOString();
+  const { stage = "new", ...rest } = input;
   const lead: CmsLead = {
-    ...input,
+    ...rest,
     id: `lead_${Date.now().toString(36)}`,
-    stage: "new",
+    stage,
     notes: "",
     createdAt: stamped,
     updatedAt: stamped,

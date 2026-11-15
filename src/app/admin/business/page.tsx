@@ -1,9 +1,11 @@
 import BusinessDesk from "@/components/admin/BusinessDesk";
-import { getCmsStore } from "@/lib/cms";
+import { getCmsStore, toPublicTeamMember } from "@/lib/cms";
 import { money } from "@/lib/finance";
+import { requireArea } from "@/lib/guard";
 import { buildReport } from "@/lib/report";
 
 export default async function AdminBusinessPage() {
+  await requireArea("business");
   const store = await getCmsStore();
   const report = buildReport(store);
 
@@ -48,7 +50,7 @@ export default async function AdminBusinessPage() {
       ) : null}
       <BusinessDesk
         projects={store.projects}
-        team={store.team}
+        team={store.team.map(toPublicTeamMember)}
         initialInvestments={store.investments ?? []}
         initialPayouts={store.payouts ?? []}
       />

@@ -2,6 +2,7 @@ import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { canManageProjects } from "@/lib/access";
 import { getAdminSession } from "@/lib/auth";
 
 const MAX_BYTES = 8 * 1024 * 1024;
@@ -15,7 +16,7 @@ const ALLOWED = new Set([
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
-  if (!session) {
+  if (!session || !canManageProjects(session.role)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

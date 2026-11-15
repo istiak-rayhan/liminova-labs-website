@@ -13,18 +13,20 @@ import {
   Search,
   Wallet,
 } from "lucide-react";
+import { canView, roleLabels, type DashboardArea } from "@/lib/access";
+import type { TeamRole } from "@/lib/cms-types";
 
-const links = [
-  { href: "/admin", label: "Overview", icon: LayoutDashboard },
-  { href: "/admin/leads", label: "Leads", icon: Inbox },
-  { href: "/admin/projects", label: "Projects", icon: FolderKanban },
-  { href: "/admin/business", label: "Business", icon: Wallet },
-  { href: "/admin/reports", label: "Reports", icon: BarChart3 },
-  { href: "/admin/team", label: "Team", icon: Users },
-  { href: "/admin/search", label: "Search listing", icon: Search },
+const links: { href: string; label: string; icon: typeof LayoutDashboard; area: DashboardArea }[] = [
+  { href: "/admin", label: "Overview", icon: LayoutDashboard, area: "overview" },
+  { href: "/admin/leads", label: "Leads", icon: Inbox, area: "leads" },
+  { href: "/admin/projects", label: "Projects", icon: FolderKanban, area: "projects" },
+  { href: "/admin/business", label: "Business", icon: Wallet, area: "business" },
+  { href: "/admin/reports", label: "Reports", icon: BarChart3, area: "reports" },
+  { href: "/admin/team", label: "Team", icon: Users, area: "team" },
+  { href: "/admin/search", label: "Search listing", icon: Search, area: "search" },
 ];
 
-export default function AdminNav({ email }: { email: string }) {
+export default function AdminNav({ email, role }: { email: string; role: TeamRole }) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -35,13 +37,14 @@ export default function AdminNav({ email }: { email: string }) {
   }
 
   return (
-    <aside className="w-full lg:w-64 shrink-0 border-b lg:border-b-0 lg:border-r border-slate-800 bg-slate-950 text-slate-100">
+    <aside className="w-full max-h-[42vh] overflow-y-auto lg:max-h-none lg:h-dvh lg:w-64 shrink-0 border-b lg:border-b-0 lg:border-r border-slate-800 bg-slate-950 text-slate-100">
       <div className="p-6">
         <p className="font-display font-bold text-lg">Liminova Admin</p>
         <p className="text-xs text-slate-400 mt-1 truncate">{email}</p>
+        <p className="text-xs font-semibold text-emerald-300 mt-2">{roleLabels[role]}</p>
       </div>
       <nav className="px-3 pb-6 space-y-1">
-        {links.map((link) => {
+        {links.filter((link) => canView(role, link.area)).map((link) => {
           const Icon = link.icon;
           const active =
             link.href === "/admin"

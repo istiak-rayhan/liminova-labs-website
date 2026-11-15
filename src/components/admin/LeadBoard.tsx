@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import type { CmsLead, LeadStage } from "@/lib/cms-types";
 import { leadStages } from "@/lib/report";
 
-export default function LeadBoard({ initialLeads }: { initialLeads: CmsLead[] }) {
+export default function LeadBoard({
+  initialLeads,
+  canDelete = false,
+}: {
+  initialLeads: CmsLead[];
+  canDelete?: boolean;
+}) {
   const router = useRouter();
   const [leads, setLeads] = useState(initialLeads);
   const [notes, setNotes] = useState<Record<string, string>>(
@@ -106,13 +112,15 @@ export default function LeadBoard({ initialLeads }: { initialLeads: CmsLead[] })
                           className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm text-slate-800 min-h-16"
                         />
                       </label>
-                      <button
-                        type="button"
-                        onClick={() => remove(lead.id)}
-                        className="mt-2 text-xs font-semibold text-red-600"
-                      >
-                        Delete
-                      </button>
+                      {canDelete ? (
+                        <button
+                          type="button"
+                          onClick={() => remove(lead.id)}
+                          className="mt-2 text-xs font-semibold text-red-600"
+                        >
+                          Delete
+                        </button>
+                      ) : null}
                     </article>
                   ))}
                 </div>

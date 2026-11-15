@@ -92,7 +92,15 @@ export type CmsTeamMember = {
   title: string;
   focus: string;
   active: boolean;
+  /** Login email. Set by leadership. */
+  email?: string;
+  /** Scrypt hash. Never send this to the browser. */
+  passwordHash?: string;
   updatedAt: string;
+};
+
+export type PublicTeamMember = Omit<CmsTeamMember, "passwordHash"> & {
+  hasLogin: boolean;
 };
 
 export type CmsLead = {

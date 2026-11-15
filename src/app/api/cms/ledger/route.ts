@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { canManageTeam } from "@/lib/access";
 import { getAdminSession } from "@/lib/auth";
-import { addInvestment, addPayout, deleteInvestment, deletePayout, getCmsStore } from "@/lib/cms";
+import { addInvestment, addPayout, deleteInvestment, deletePayout, getCmsStore, setProjectShare } from "@/lib/cms";
 import { memberDue } from "@/lib/finance";
 
 function amountOf(value: unknown) {
@@ -16,7 +17,9 @@ function dateOf(value: unknown) {
 
 export async function POST(request: Request) {
   const session = await getAdminSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session || !canManageTeam(session.role)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const body = (await request.json()) as {
     kind?: string;
@@ -28,6 +31,7 @@ export async function POST(request: Request) {
     note?: string;
     projectId?: string;
     memberId?: string;
+    percent?: unknown;
   };
 
   try {
@@ -35,6 +39,13 @@ export async function POST(request: Request) {
       await deleteInvestment(body.id);
     } else if (body.kind === "payout" && body.action === "delete" && body.id) {
       await deletePayout(body.id);
+    } else if (body.kind === "share" && body.action === "set") {
+      const percent = typeof body.percent === "number" ? body.percent : Number(body.percent);
+      if (!body.projectId || !body.memberId || !Number.isFinite(percent) || percent < 0 || percent > 100) {
+        return NextResponse.json({ error: "Project, person, and a percent from 0 to 100 are required." }, { status: 400 });
+      }
+      const updated = await setProjectShare(body.projectId, body.memberId, Math.round(percent * 100) / 100);
+      if (!updated) return NextResponse.json({ error: "Project not found." }, { status: 404 });
     } else if (body.kind === "investment" && body.action === "add") {
       const section = body.section?.trim() ?? "";
       const amount = amountOf(body.amount);
@@ -79,6 +90,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       investments: store.investments ?? [],
       payouts: store.payouts ?? [],
+      projects: store.projects,
     });
   } catch {
     return NextResponse.json({ error: "Could not update the ledger." }, { status: 500 });

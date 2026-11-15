@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { getCmsStore } from "@/lib/cms";
 import { money } from "@/lib/finance";
+import { requireArea } from "@/lib/guard";
 import { buildReport, leadStages, statusLabels } from "@/lib/report";
 
 export default async function AdminReportsPage() {
+  await requireArea("reports");
   const store = await getCmsStore();
   const report = buildReport(store);
   const maxStage = Math.max(1, ...Object.values(report.byStage));

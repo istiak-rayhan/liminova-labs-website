@@ -54,10 +54,12 @@ export default function ProjectManager({
   initialProjects,
   team,
   filter,
+  capability = "manage",
 }: {
   initialProjects: CmsProject[];
   team: CmsTeamMember[];
   filter?: ProjectStatus;
+  capability?: "manage" | "tasks" | "view";
 }) {
   const router = useRouter();
   const [projects, setProjects] = useState(initialProjects);
@@ -217,20 +219,116 @@ export default function ProjectManager({
         <div>
           <h1 className="font-display text-3xl font-semibold text-slate-900">Projects</h1>
           <p className="text-slate-500 mt-1">
-            Website showcase and the private accounts for each engagement live here.
-            Uncheck “Show on the website” to hide a project from the live site.
+            {capability === "manage"
+              ? "Website showcase and the private accounts for each engagement live here. Uncheck “Show on the website” to hide a project from the live site."
+              : capability === "tasks"
+                ? "These are the projects assigned to you. Edit updates the next step and tasks only."
+                : "Project list for your role. Editing accounts and publishing is limited to leadership and operations."}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={startCreate}
-          className="rounded-full bg-emerald-500 text-white px-4 py-2 text-sm font-semibold"
-        >
-          New project
-        </button>
+        {capability === "manage" ? (
+          <button
+            type="button"
+            onClick={startCreate}
+            className="rounded-full bg-emerald-500 text-white px-4 py-2 text-sm font-semibold"
+          >
+            New project
+          </button>
+        ) : null}
       </div>
 
-      {editing ? (
+      {editing && capability === "tasks" ? (
+        <form
+          onSubmit={save}
+          className="rounded-2xl bg-white border border-slate-200 p-6 space-y-4"
+        >
+          <h2 className="font-semibold text-lg text-slate-900">{editing.title}</h2>
+          <label className="block text-sm">
+            <span className="font-medium text-slate-700">Next action</span>
+            <input
+              value={editing.nextAction ?? ""}
+              onChange={(event) => setEditing({ ...editing, nextAction: event.target.value })}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+            />
+          </label>
+          <div className="rounded-2xl border border-slate-200 p-4">
+            <p className="font-medium text-slate-900 mb-3">Tasks</p>
+            <ul className="space-y-2 mb-3">
+              {(editing.tasks ?? []).map((task) => (
+                <li key={task.id} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={task.done}
+                    onChange={(event) =>
+                      setEditing({
+                        ...editing,
+                        tasks: (editing.tasks ?? []).map((item) =>
+                          item.id === task.id ? { ...item, done: event.target.checked } : item,
+                        ),
+                      })
+                    }
+                  />
+                  <span className={task.done ? "text-slate-400 line-through" : "text-slate-800"}>
+                    {task.title}
+                  </span>
+                  <button
+                    type="button"
+                    className="ml-auto text-xs font-semibold text-red-600"
+                    onClick={() =>
+                      setEditing({
+                        ...editing,
+                        tasks: (editing.tasks ?? []).filter((item) => item.id !== task.id),
+                      })
+                    }
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div className="flex gap-2">
+              <input
+                id="dev-task"
+                className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                placeholder="Add a task"
+                onKeyDown={(event) => {
+                  if (event.key !== "Enter") return;
+                  event.preventDefault();
+                  const title = event.currentTarget.value.trim();
+                  if (!title) return;
+                  setEditing({
+                    ...editing,
+                    tasks: [
+                      ...(editing.tasks ?? []),
+                      { id: `task_${Date.now().toString(36)}`, title, done: false },
+                    ],
+                  });
+                  event.currentTarget.value = "";
+                }}
+              />
+            </div>
+          </div>
+          {error ? <p className="text-sm text-red-600">{error}</p> : null}
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-full bg-emerald-500 text-white px-4 py-2 text-sm font-semibold disabled:opacity-60"
+            >
+              {saving ? "Saving…" : "Save tasks"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditing(null)}
+              className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : null}
+
+      {editing && capability === "manage" ? (
         <form
           onSubmit={save}
           className="rounded-2xl bg-white border border-slate-200 p-6 grid md:grid-cols-2 gap-4"
@@ -598,10 +696,14 @@ export default function ProjectManager({
             <tr>
               <th className="px-4 py-3 font-semibold">Project</th>
               <th className="px-4 py-3 font-semibold">Status</th>
-              <th className="px-4 py-3 font-semibold">Received</th>
-              <th className="px-4 py-3 font-semibold">Remaining</th>
-              <th className="px-4 py-3 font-semibold">On site</th>
-              <th className="px-4 py-3 font-semibold">Actions</th>
+              {capability === "manage" ? (
+                <>
+                  <th className="px-4 py-3 font-semibold">Received</th>
+                  <th className="px-4 py-3 font-semibold">Remaining</th>
+                  <th className="px-4 py-3 font-semibold">On site</th>
+                </>
+              ) : null}
+              {capability !== "view" ? <th className="px-4 py-3 font-semibold">Edit</th> : null}
             </tr>
           </thead>
           <tbody>
@@ -612,25 +714,33 @@ export default function ProjectManager({
                   <p className="text-slate-500">{project.company?.trim() || project.category}</p>
                 </td>
                 <td className="px-4 py-3">{statusLabels[project.status]}</td>
-                <td className="px-4 py-3">{money(receivedOf(project))}</td>
-                <td className="px-4 py-3">{money(remainingOf(project))}</td>
-                <td className="px-4 py-3">{project.published ? "Shown" : "Hidden"}</td>
-                <td className="px-4 py-3 space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => startEdit(project)}
-                    className="text-emerald-700 font-semibold"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => remove(project.id)}
-                    className="text-red-600 font-semibold"
-                  >
-                    Delete
-                  </button>
-                </td>
+                {capability === "manage" ? (
+                  <>
+                    <td className="px-4 py-3">{money(receivedOf(project))}</td>
+                    <td className="px-4 py-3">{money(remainingOf(project))}</td>
+                    <td className="px-4 py-3">{project.published ? "Shown" : "Hidden"}</td>
+                  </>
+                ) : null}
+                {capability !== "view" ? (
+                  <td className="px-4 py-3 space-x-3 whitespace-nowrap">
+                    <button
+                      type="button"
+                      onClick={() => startEdit(project)}
+                      className="text-emerald-700 font-semibold"
+                    >
+                      Edit
+                    </button>
+                    {capability === "manage" ? (
+                      <button
+                        type="button"
+                        onClick={() => remove(project.id)}
+                        className="text-red-600 font-semibold"
+                      >
+                        Delete
+                      </button>
+                    ) : null}
+                  </td>
+                ) : null}
               </tr>
             ))}
           </tbody>

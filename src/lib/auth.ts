@@ -1,9 +1,17 @@
-import { timingSafeEqual } from "crypto";
+import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
+import { normalizeRole } from "@/lib/access";
+import type { TeamRole } from "@/lib/cms-types";
 
 export const ADMIN_COOKIE = "liminova_admin_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+
+export type DashboardSession = {
+  email: string;
+  role: TeamRole;
+  memberId?: string;
+};
 
 function getSecret() {
   const secret = process.env.ADMIN_SESSION_SECRET;
@@ -20,8 +28,12 @@ export function getAdminCredentials() {
   };
 }
 
-export async function createAdminSession(email: string) {
-  const token = await new SignJWT({ email, role: "admin" })
+export async function createAdminSession(
+  email: string,
+  role: TeamRole = "leadership",
+  memberId?: string,
+) {
+  const token = await new SignJWT({ email, role, memberId })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${MAX_AGE}s`)
@@ -42,19 +54,34 @@ export async function clearAdminSession() {
   jar.delete(ADMIN_COOKIE);
 }
 
-export async function getAdminSession() {
+export async function getAdminSession(): Promise<DashboardSession | null> {
   const jar = await cookies();
   const token = jar.get(ADMIN_COOKIE)?.value;
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, getSecret());
-    if (payload.role !== "admin" || typeof payload.email !== "string") {
-      return null;
-    }
-    return { email: payload.email, role: "admin" as const };
+    const role = normalizeRole(payload.role);
+    if (!role || typeof payload.email !== "string") return null;
+    const memberId = typeof payload.memberId === "string" ? payload.memberId : undefined;
+    return { email: payload.email, role, memberId };
   } catch {
     return null;
   }
+}
+
+export function hashPassword(password: string) {
+  const salt = randomBytes(16).toString("hex");
+  const hash = scryptSync(password, salt, 32).toString("hex");
+  return `scrypt$${salt}$${hash}`;
+}
+
+export function verifyPassword(password: string, stored: string) {
+  const [scheme, salt, hex] = stored.split("$");
+  if (scheme !== "scrypt" || !salt || !hex) return false;
+  const actual = scryptSync(password, salt, 32);
+  const expected = Buffer.from(hex, "hex");
+  if (actual.length !== expected.length) return false;
+  return timingSafeEqual(actual, expected);
 }
 
 export function verifyCredentials(email: string, password: string) {

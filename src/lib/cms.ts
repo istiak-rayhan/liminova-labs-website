@@ -12,6 +12,7 @@ import type {
   CmsStore,
   CmsTeamMember,
   ProjectStatus,
+  PublicTeamMember,
 } from "@/lib/cms-types";
 import type { Project } from "@/data/projects";
 
@@ -260,6 +261,11 @@ export async function deleteProject(id: string) {
   refreshPublic(removed?.slug);
 }
 
+export function toPublicTeamMember(member: CmsTeamMember): PublicTeamMember {
+  const { passwordHash, ...rest } = member;
+  return { ...rest, hasLogin: Boolean(member.email && passwordHash) };
+}
+
 export async function upsertTeamMember(input: CmsTeamMember) {
   const store = await getCmsStore();
   const index = store.team.findIndex((member) => member.id === input.id);
@@ -354,4 +360,16 @@ export async function deletePayout(id: string) {
   const store = await getCmsStore();
   store.payouts = (store.payouts ?? []).filter((item) => item.id !== id);
   await saveCmsStore(store);
+}
+
+export async function setProjectShare(projectId: string, memberId: string, percent: number) {
+  const store = await getCmsStore();
+  const project = store.projects.find((item) => item.id === projectId);
+  if (!project) return null;
+  const shares = (project.shares ?? []).filter((share) => share.memberId !== memberId);
+  if (percent > 0) shares.push({ memberId, percent });
+  project.shares = shares;
+  project.updatedAt = new Date().toISOString();
+  await saveCmsStore(store);
+  return project;
 }

@@ -20,8 +20,11 @@ export default function BusinessDesk({
   initialPayouts: CmsPayout[];
 }) {
   const router = useRouter();
+  const [projectRows, setProjectRows] = useState(projects);
   const [investments, setInvestments] = useState(initialInvestments);
   const [payouts, setPayouts] = useState(initialPayouts);
+  const [editingShare, setEditingShare] = useState<string | null>(null);
+  const [shareDrafts, setShareDrafts] = useState<Record<string, string>>({});
   const [section, setSection] = useState(sections[0]);
   const [customSection, setCustomSection] = useState("");
   const [amount, setAmount] = useState("");
@@ -41,7 +44,7 @@ export default function BusinessDesk({
       paid: number;
       remaining: number;
     }[] = [];
-    for (const project of projects) {
+    for (const project of projectRows) {
       for (const share of project.shares ?? []) {
         const member = team.find((item) => item.id === share.memberId);
         if (!member) continue;
@@ -50,7 +53,7 @@ export default function BusinessDesk({
       }
     }
     return rows.sort((a, b) => b.remaining - a.remaining || a.member.name.localeCompare(b.member.name));
-  }, [projects, team, payouts]);
+  }, [projectRows, team, payouts]);
 
   async function send(body: Record<string, unknown>) {
     setBusy(true);
@@ -65,6 +68,7 @@ export default function BusinessDesk({
         error?: string;
         investments?: CmsInvestment[];
         payouts?: CmsPayout[];
+        projects?: CmsProject[];
       };
       if (!response.ok) {
         setError(data.error ?? "Could not save.");
@@ -72,6 +76,7 @@ export default function BusinessDesk({
       }
       if (data.investments) setInvestments(data.investments);
       if (data.payouts) setPayouts(data.payouts);
+      if (data.projects) setProjectRows(data.projects);
       router.refresh();
       return true;
     } catch {
@@ -207,7 +212,8 @@ export default function BusinessDesk({
                   <th className="py-2 pr-3 font-semibold">Owed</th>
                   <th className="py-2 pr-3 font-semibold">Paid</th>
                   <th className="py-2 pr-3 font-semibold">Remaining</th>
-                  <th className="py-2 font-semibold">Pay</th>
+                  <th className="py-2 pr-3 font-semibold">Pay</th>
+                  <th className="py-2 font-semibold sticky right-0 bg-white">Edit</th>
                 </tr>
               </thead>
               <tbody>
@@ -260,6 +266,50 @@ export default function BusinessDesk({
                         </div>
                       )}
                     </td>
+                    <td className="py-3 sticky right-0 bg-white">
+                      {editingShare === row.key ? (
+                        <div className="flex gap-2">
+                          <input
+                            inputMode="decimal"
+                            value={shareDrafts[row.key] ?? String(row.percent)}
+                            onChange={(event) =>
+                              setShareDrafts((current) => ({ ...current, [row.key]: event.target.value }))
+                            }
+                            className="w-16 rounded-xl border border-slate-200 px-2 py-1.5"
+                            aria-label={`Share percent for ${row.member.name}`}
+                          />
+                          <button
+                            type="button"
+                            disabled={busy}
+                            className="text-xs font-semibold text-emerald-700"
+                            onClick={() => {
+                              void send({
+                                kind: "share",
+                                action: "set",
+                                projectId: row.project.id,
+                                memberId: row.member.id,
+                                percent: Number(shareDrafts[row.key] ?? row.percent),
+                              }).then((saved) => {
+                                if (saved) setEditingShare(null);
+                              });
+                            }}
+                          >
+                            Save
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className="text-emerald-700 font-semibold"
+                          onClick={() => {
+                            setEditingShare(row.key);
+                            setShareDrafts((current) => ({ ...current, [row.key]: String(row.percent) }));
+                          }}
+                        >
+                          Edit
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -270,7 +320,7 @@ export default function BusinessDesk({
           <ul className="mt-4 space-y-2 text-sm text-slate-600">
             {payouts.map((payout) => {
               const member = team.find((item) => item.id === payout.memberId);
-              const project = projects.find((item) => item.id === payout.projectId);
+              const project = projectRows.find((item) => item.id === payout.projectId);
               return (
                 <li key={payout.id} className="flex flex-wrap gap-2">
                   <span>

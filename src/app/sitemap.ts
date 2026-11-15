@@ -20,7 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${site.url}${path}`,
       lastModified: now,
       changeFrequency: path === "" ? ("weekly" as const) : ("monthly" as const),
-      priority: path === "" ? 1 : 0.7,
+      priority: path === "" ? 1 : path === "/services" || path === "/portfolio" ? 0.9 : 0.6,
     }),
   );
 
@@ -35,7 +35,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${site.url}/services/${service.slug}`,
     lastModified: now,
     changeFrequency: "monthly" as const,
-    priority: 0.6,
+    priority: 0.8,
   }));
 
   return [...staticRoutes, ...projectRoutes, ...serviceRoutes];

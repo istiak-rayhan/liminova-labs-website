@@ -2,12 +2,24 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, FolderKanban, Users, LogOut, ExternalLink } from "lucide-react";
+import {
+  LayoutDashboard,
+  FolderKanban,
+  Users,
+  LogOut,
+  ExternalLink,
+  Inbox,
+  BarChart3,
+  Search,
+} from "lucide-react";
 
 const links = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
+  { href: "/admin/leads", label: "Leads", icon: Inbox },
   { href: "/admin/projects", label: "Projects", icon: FolderKanban },
+  { href: "/admin/reports", label: "Report", icon: BarChart3 },
   { href: "/admin/team", label: "Team", icon: Users },
+  { href: "/admin/search", label: "Search listing", icon: Search },
 ];
 
 export default function AdminNav({ email }: { email: string }) {

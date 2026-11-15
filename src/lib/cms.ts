@@ -2,7 +2,13 @@ import { promises as fs } from "fs";
 import path from "path";
 import { get, put } from "@vercel/blob";
 import { createSeedStore } from "@/lib/cms-seed";
-import type { CmsProject, CmsStore, CmsTeamMember, ProjectStatus } from "@/lib/cms-types";
+import type {
+  CmsLead,
+  CmsProject,
+  CmsStore,
+  CmsTeamMember,
+  ProjectStatus,
+} from "@/lib/cms-types";
 import type { Project } from "@/data/projects";
 
 const BLOB_KEY = "cms/store.json";
@@ -64,6 +70,27 @@ async function writeBlob(store: CmsStore) {
   });
 }
 
+function normalizeStore(store: CmsStore): { store: CmsStore; changed: boolean } {
+  let changed = false;
+  const leads = Array.isArray(store.leads) ? store.leads : [];
+  if (!Array.isArray(store.leads)) changed = true;
+
+  const projects = store.projects.map((project) => {
+    const tasks = Array.isArray(project.tasks) ? project.tasks : [];
+    const nextAction = project.nextAction ?? "";
+    if (!Array.isArray(project.tasks) || project.nextAction === undefined) {
+      changed = true;
+      return { ...project, tasks, nextAction };
+    }
+    return project;
+  });
+
+  return {
+    store: { ...store, leads, projects },
+    changed,
+  };
+}
+
 function enrichFromSeed(store: CmsStore): { store: CmsStore; changed: boolean } {
   const seeds = createSeedStore().projects;
   const bySlug = new Map(seeds.map((project) => [project.slug, project]));
@@ -93,8 +120,10 @@ function enrichFromSeed(store: CmsStore): { store: CmsStore; changed: boolean } 
 export async function getCmsStore(): Promise<CmsStore> {
   const existing = hasBlob() ? await readBlob() : await readLocal();
   if (existing?.version === 1) {
-    const { store, changed } = enrichFromSeed(existing);
-    if (changed) await saveCmsStore(store);
+    const normalized = normalizeStore(existing);
+    const enriched = enrichFromSeed(normalized.store);
+    const store = enriched.store;
+    if (normalized.changed || enriched.changed) await saveCmsStore(store);
     return store;
   }
   const seeded = createSeedStore();
@@ -189,4 +218,45 @@ export function newProjectId() {
 
 export function newTeamId() {
   return `team_${Date.now().toString(36)}`;
+}
+
+export async function createLead(
+  input: Omit<CmsLead, "id" | "stage" | "notes" | "createdAt" | "updatedAt">,
+) {
+  const store = await getCmsStore();
+  const stamped = new Date().toISOString();
+  const lead: CmsLead = {
+    ...input,
+    id: `lead_${Date.now().toString(36)}`,
+    stage: "new",
+    notes: "",
+    createdAt: stamped,
+    updatedAt: stamped,
+  };
+  store.leads = [lead, ...(store.leads ?? [])];
+  await saveCmsStore(store);
+  return lead;
+}
+
+export async function updateLead(
+  id: string,
+  patch: Partial<Pick<CmsLead, "stage" | "notes">>,
+) {
+  const store = await getCmsStore();
+  const index = store.leads.findIndex((lead) => lead.id === id);
+  if (index < 0) return null;
+  const next = {
+    ...store.leads[index],
+    ...patch,
+    updatedAt: new Date().toISOString(),
+  };
+  store.leads[index] = next;
+  await saveCmsStore(store);
+  return next;
+}
+
+export async function deleteLead(id: string) {
+  const store = await getCmsStore();
+  store.leads = store.leads.filter((lead) => lead.id !== id);
+  await saveCmsStore(store);
 }

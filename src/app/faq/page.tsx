@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { faqs } from "@/data/faqs";
 import { getBookingHref, site } from "@/data/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "FAQ",
-  description:
-    "Pricing, IP, timelines, communication, and what Liminova Labs will not take on.",
-};
+export const metadata: Metadata = pageMetadata(
+  "/faq",
+  "FAQ",
+  "Pricing, ownership, timelines, and how to hire Liminova Labs for Flutter, Next.js, LMS, SEO, or an embedded engineer.",
+);
 
 export default function FaqPage() {
   return (
@@ -48,6 +49,20 @@ export default function FaqPage() {
           ))}
         </div>
       </div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((faq) => ({
+              "@type": "Question",
+              name: faq.question,
+              acceptedAnswer: { "@type": "Answer", text: faq.answer },
+            })),
+          }),
+        }}
+      />
     </main>
   );
 }

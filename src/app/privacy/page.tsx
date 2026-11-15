@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { site } from "@/data/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "How Liminova Labs collects, uses, and retains inquiry data.",
-};
+export const metadata: Metadata = pageMetadata(
+  "/privacy",
+  "Privacy Policy",
+  "How Liminova Labs collects, stores, and retains inquiry data from the website.",
+);
 
 export default function PrivacyPolicy() {
   return (
@@ -27,9 +29,10 @@ export default function PrivacyPolicy() {
           <h2 className="text-2xl font-bold text-slate-900 pt-4">What we collect</h2>
           <p>
             When you submit the contact form we collect name, work email,
-            company, project type, budget band, timeline, and message. If you
-            email us directly we also process the contents of that thread. We
-            do not sell personal data.
+            company, project type, budget band, timeline, and message. That
+            brief is stored in our private studio dashboard so we can reply and
+            track the conversation. If you email us directly we also process
+            the contents of that thread. We do not sell personal data.
           </p>
 
           <h2 className="text-2xl font-bold text-slate-900 pt-4">Why we collect it</h2>

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { site } from "@/data/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms of Service",
-  description: "Terms for using the Liminova Labs website and engaging the studio.",
-};
+export const metadata: Metadata = pageMetadata(
+  "/terms",
+  "Terms of Service",
+  "Terms for using the Liminova Labs website and engaging the studio.",
+);
 
 export default function TermsOfService() {
   return (

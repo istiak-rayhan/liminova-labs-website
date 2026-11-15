@@ -3,12 +3,13 @@ import Link from "next/link";
 import BookingSteps from "@/components/BookingSteps";
 import TrackLink from "@/components/TrackLink";
 import { site } from "@/data/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Book a consultation",
-  description:
-    "Pick a time with Liminova Labs or send a brief. We reply within one business day.",
-};
+export const metadata: Metadata = pageMetadata(
+  "/book",
+  "Book a consultation",
+  "Book a working conversation with Liminova Labs about a Flutter app, Next.js platform, LMS, or growth engagement. We reply within one business day.",
+);
 
 export default function BookPage() {
   const calendly = site.calendly;

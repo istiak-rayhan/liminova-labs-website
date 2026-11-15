@@ -27,6 +27,9 @@ const emptyForm = (): Omit<CmsProject, "updatedAt"> => ({
   before: "",
   after: "",
   quotation: "",
+  dealValue: undefined,
+  nextAction: "",
+  tasks: [],
   timeline: "",
   partners: [],
   metrics: [
@@ -328,6 +331,111 @@ export default function ProjectManager({
               />
               Featured
             </label>
+          </div>
+          <label className="block text-sm">
+            <span className="font-medium text-slate-700">Deal value (USD)</span>
+            <input
+              inputMode="decimal"
+              value={editing.dealValue ?? ""}
+              onChange={(event) => {
+                const raw = event.target.value.trim();
+                const dealValue = raw === "" ? undefined : Number(raw);
+                setEditing({
+                  ...editing,
+                  dealValue: Number.isFinite(dealValue) ? dealValue : undefined,
+                });
+              }}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              placeholder="15000"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="font-medium text-slate-700">Next action</span>
+            <input
+              value={editing.nextAction ?? ""}
+              onChange={(event) =>
+                setEditing({ ...editing, nextAction: event.target.value })
+              }
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              placeholder="Send the scope note"
+            />
+          </label>
+          <div className="md:col-span-2 rounded-2xl border border-slate-200 p-4">
+            <p className="font-medium text-slate-900 mb-3">Tasks</p>
+            <ul className="space-y-2 mb-3">
+              {(editing.tasks ?? []).map((task) => (
+                <li key={task.id} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={task.done}
+                    onChange={(event) =>
+                      setEditing({
+                        ...editing,
+                        tasks: (editing.tasks ?? []).map((item) =>
+                          item.id === task.id ? { ...item, done: event.target.checked } : item,
+                        ),
+                      })
+                    }
+                  />
+                  <span className={task.done ? "text-slate-400 line-through" : "text-slate-800"}>
+                    {task.title}
+                  </span>
+                  <button
+                    type="button"
+                    className="ml-auto text-xs font-semibold text-red-600"
+                    onClick={() =>
+                      setEditing({
+                        ...editing,
+                        tasks: (editing.tasks ?? []).filter((item) => item.id !== task.id),
+                      })
+                    }
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div className="flex gap-2">
+              <input
+                id="new-task"
+                className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                placeholder="Add a task"
+                onKeyDown={(event) => {
+                  if (event.key !== "Enter") return;
+                  event.preventDefault();
+                  const input = event.currentTarget;
+                  const title = input.value.trim();
+                  if (!title) return;
+                  setEditing({
+                    ...editing,
+                    tasks: [
+                      ...(editing.tasks ?? []),
+                      { id: `task_${Date.now().toString(36)}`, title, done: false },
+                    ],
+                  });
+                  input.value = "";
+                }}
+              />
+              <button
+                type="button"
+                className="rounded-full border border-slate-200 px-3 py-2 text-sm font-semibold"
+                onClick={() => {
+                  const input = document.getElementById("new-task") as HTMLInputElement | null;
+                  const title = input?.value.trim() ?? "";
+                  if (!title || !input) return;
+                  setEditing({
+                    ...editing,
+                    tasks: [
+                      ...(editing.tasks ?? []),
+                      { id: `task_${Date.now().toString(36)}`, title, done: false },
+                    ],
+                  });
+                  input.value = "";
+                }}
+              >
+                Add
+              </button>
+            </div>
           </div>
           <label className="block text-sm md:col-span-2">
             <span className="font-medium text-slate-700">

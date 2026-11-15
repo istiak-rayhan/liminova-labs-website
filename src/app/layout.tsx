@@ -26,9 +26,13 @@ export const metadata: Metadata = {
   },
   description: site.description,
   keywords: [...site.keywords],
-  alternates: {
-    canonical: "/",
+  robots: {
+    index: true,
+    follow: true,
   },
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
   openGraph: {
     title: site.title,
     description: site.description,

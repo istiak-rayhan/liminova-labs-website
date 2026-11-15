@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getPublishedProjects } from "@/lib/cms";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Work",
-  description:
-    "Selected Liminova Labs platforms: B-FRENCH, PrimexN, Prep-Civique, UrbanRide, and Livira Fashion.",
-};
+export const metadata: Metadata = pageMetadata(
+  "/portfolio",
+  "Work",
+  "Flutter, Next.js, and LMS work from Liminova Labs: B-FRENCH, PrimexN, Prep-Civique, UrbanRide, and Livira Fashion.",
+);
 
 export default async function PortfolioIndexPage() {
   const projects = await getPublishedProjects();

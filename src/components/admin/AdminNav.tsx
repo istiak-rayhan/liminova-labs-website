@@ -11,13 +11,15 @@ import {
   Inbox,
   BarChart3,
   Search,
+  Wallet,
 } from "lucide-react";
 
 const links = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/leads", label: "Leads", icon: Inbox },
   { href: "/admin/projects", label: "Projects", icon: FolderKanban },
-  { href: "/admin/reports", label: "Report", icon: BarChart3 },
+  { href: "/admin/business", label: "Business", icon: Wallet },
+  { href: "/admin/reports", label: "Reports", icon: BarChart3 },
   { href: "/admin/team", label: "Team", icon: Users },
   { href: "/admin/search", label: "Search listing", icon: Search },
 ];

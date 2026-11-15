@@ -1,9 +1,13 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { revalidatePath } from "next/cache";
+import { connection } from "next/server";
 import { get, put } from "@vercel/blob";
 import { createSeedStore } from "@/lib/cms-seed";
 import type {
+  CmsInvestment,
   CmsLead,
+  CmsPayout,
   CmsProject,
   CmsStore,
   CmsTeamMember,
@@ -74,19 +78,45 @@ function normalizeStore(store: CmsStore): { store: CmsStore; changed: boolean } 
   let changed = false;
   const leads = Array.isArray(store.leads) ? store.leads : [];
   if (!Array.isArray(store.leads)) changed = true;
+  const payouts = Array.isArray(store.payouts) ? store.payouts : [];
+  if (!Array.isArray(store.payouts)) changed = true;
+  const investments = Array.isArray(store.investments) ? store.investments : [];
+  if (!Array.isArray(store.investments)) changed = true;
 
   const projects = store.projects.map((project) => {
     const tasks = Array.isArray(project.tasks) ? project.tasks : [];
     const nextAction = project.nextAction ?? "";
-    if (!Array.isArray(project.tasks) || project.nextAction === undefined) {
-      changed = true;
-      return { ...project, tasks, nextAction };
-    }
-    return project;
+    const phases = Array.isArray(project.phases) ? project.phases : [];
+    const receipts = Array.isArray(project.receipts) ? project.receipts : [];
+    const shares = Array.isArray(project.shares) ? project.shares : [];
+    const company = project.company ?? "";
+    const migrateValue =
+      project.finalizedValue === undefined && typeof project.dealValue === "number";
+    const finalizedValue = migrateValue ? project.dealValue : project.finalizedValue;
+    const needs =
+      !Array.isArray(project.tasks) ||
+      project.nextAction === undefined ||
+      !Array.isArray(project.phases) ||
+      !Array.isArray(project.receipts) ||
+      !Array.isArray(project.shares) ||
+      project.company === undefined ||
+      migrateValue;
+    if (!needs) return project;
+    changed = true;
+    return {
+      ...project,
+      tasks,
+      nextAction,
+      phases,
+      receipts,
+      shares,
+      company,
+      finalizedValue,
+    };
   });
 
   return {
-    store: { ...store, leads, projects },
+    store: { ...store, leads, payouts, investments, projects },
     changed,
   };
 }
@@ -117,25 +147,54 @@ function enrichFromSeed(store: CmsStore): { store: CmsStore; changed: boolean } 
   return { store: changed ? { ...store, projects } : store, changed };
 }
 
-export async function getCmsStore(): Promise<CmsStore> {
+const CACHE_MS = 15_000;
+let memory: { at: number; store: CmsStore } | null = null;
+let inflight: Promise<CmsStore> | null = null;
+
+function remember(store: CmsStore) {
+  memory = { at: Date.now(), store: structuredClone(store) };
+}
+
+async function loadStore(): Promise<CmsStore> {
   const existing = hasBlob() ? await readBlob() : await readLocal();
   if (existing?.version === 1) {
     const normalized = normalizeStore(existing);
     const enriched = enrichFromSeed(normalized.store);
     const store = enriched.store;
-    if (normalized.changed || enriched.changed) await saveCmsStore(store);
+    if (normalized.changed || enriched.changed) return saveCmsStore(store);
+    remember(store);
     return store;
   }
   const seeded = createSeedStore();
-  await saveCmsStore(seeded);
-  return seeded;
+  return saveCmsStore(seeded);
+}
+
+export async function getCmsStore(): Promise<CmsStore> {
+  if (memory && Date.now() - memory.at < CACHE_MS) {
+    return structuredClone(memory.store);
+  }
+  if (!inflight) {
+    inflight = loadStore().finally(() => {
+      inflight = null;
+    });
+  }
+  const store = await inflight;
+  return structuredClone(store);
 }
 
 export async function saveCmsStore(store: CmsStore) {
   const next = { ...store, updatedAt: new Date().toISOString() };
   if (hasBlob()) await writeBlob(next);
   else await writeLocal(next);
+  remember(next);
   return next;
+}
+
+function refreshPublic(slug?: string) {
+  revalidatePath("/");
+  revalidatePath("/portfolio");
+  revalidatePath("/sitemap.xml");
+  if (slug) revalidatePath(`/portfolio/${slug}`);
 }
 
 export function cmsProjectToPublic(project: CmsProject): Project {
@@ -162,9 +221,10 @@ export function cmsProjectToPublic(project: CmsProject): Project {
 }
 
 export async function getPublishedProjects(): Promise<Project[]> {
+  await connection();
   const store = await getCmsStore();
   return store.projects
-    .filter((project) => project.published && project.status === "completed")
+    .filter((project) => project.published)
     .sort((a, b) => Number(b.featured) - Number(a.featured))
     .map(cmsProjectToPublic);
 }
@@ -187,13 +247,17 @@ export async function upsertProject(input: CmsProject) {
   if (index >= 0) store.projects[index] = next;
   else store.projects.unshift(next);
   await saveCmsStore(store);
+  refreshPublic(next.slug);
   return next;
 }
 
 export async function deleteProject(id: string) {
   const store = await getCmsStore();
+  const removed = store.projects.find((project) => project.id === id);
   store.projects = store.projects.filter((project) => project.id !== id);
+  store.payouts = (store.payouts ?? []).filter((payout) => payout.projectId !== id);
   await saveCmsStore(store);
+  refreshPublic(removed?.slug);
 }
 
 export async function upsertTeamMember(input: CmsTeamMember) {
@@ -261,5 +325,33 @@ export async function updateLead(
 export async function deleteLead(id: string) {
   const store = await getCmsStore();
   store.leads = store.leads.filter((lead) => lead.id !== id);
+  await saveCmsStore(store);
+}
+
+export async function addInvestment(input: Omit<CmsInvestment, "id">) {
+  const store = await getCmsStore();
+  const item: CmsInvestment = { ...input, id: `inv_${Date.now().toString(36)}` };
+  store.investments = [item, ...(store.investments ?? [])];
+  await saveCmsStore(store);
+  return item;
+}
+
+export async function deleteInvestment(id: string) {
+  const store = await getCmsStore();
+  store.investments = (store.investments ?? []).filter((item) => item.id !== id);
+  await saveCmsStore(store);
+}
+
+export async function addPayout(input: Omit<CmsPayout, "id">) {
+  const store = await getCmsStore();
+  const item: CmsPayout = { ...input, id: `pay_${Date.now().toString(36)}` };
+  store.payouts = [item, ...(store.payouts ?? [])];
+  await saveCmsStore(store);
+  return item;
+}
+
+export async function deletePayout(id: string) {
+  const store = await getCmsStore();
+  store.payouts = (store.payouts ?? []).filter((item) => item.id !== id);
   await saveCmsStore(store);
 }

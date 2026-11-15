@@ -4,7 +4,10 @@ import { FormEvent, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, Star, Upload, X } from "lucide-react";
-import type { CmsProject, ProjectStatus } from "@/lib/cms-types";
+import type { CmsProject, CmsTeamMember, ProjectStatus } from "@/lib/cms-types";
+import { money, remainingOf, receivedOf } from "@/lib/finance";
+import { statusLabels } from "@/lib/report";
+import ProjectAccounts from "@/components/admin/ProjectAccounts";
 
 const statuses: ProjectStatus[] = ["pipeline", "ongoing", "completed"];
 
@@ -27,7 +30,12 @@ const emptyForm = (): Omit<CmsProject, "updatedAt"> => ({
   before: "",
   after: "",
   quotation: "",
+  company: "",
+  finalizedValue: undefined,
   dealValue: undefined,
+  phases: [],
+  receipts: [],
+  shares: [],
   nextAction: "",
   tasks: [],
   timeline: "",
@@ -44,9 +52,11 @@ const emptyForm = (): Omit<CmsProject, "updatedAt"> => ({
 
 export default function ProjectManager({
   initialProjects,
+  team,
   filter,
 }: {
   initialProjects: CmsProject[];
+  team: CmsTeamMember[];
   filter?: ProjectStatus;
 }) {
   const router = useRouter();
@@ -153,6 +163,12 @@ export default function ProjectManager({
       images: editing.images.length
         ? editing.images
         : ["/projects/bfrench-web.png"],
+      company: editing.company ?? "",
+      phases: editing.phases ?? [],
+      receipts: editing.receipts ?? [],
+      shares: editing.shares ?? [],
+      finalizedValue: editing.finalizedValue,
+      dealValue: editing.finalizedValue,
       updatedAt: new Date().toISOString(),
     };
     try {
@@ -201,8 +217,8 @@ export default function ProjectManager({
         <div>
           <h1 className="font-display text-3xl font-semibold text-slate-900">Projects</h1>
           <p className="text-slate-500 mt-1">
-            Treat each engagement like inventory — pipeline, ongoing, completed.
-            Published completed work appears on Selected work.
+            Website showcase and the private accounts for each engagement live here.
+            Uncheck “Show on the website” to hide a project from the live site.
           </p>
         </div>
         <button
@@ -247,6 +263,10 @@ export default function ProjectManager({
               />
             </label>
           ))}
+          <h3 className="md:col-span-2 font-semibold text-slate-900 pt-2">Website showcase</h3>
+          <p className="md:col-span-2 text-sm text-slate-500 -mt-2">
+            Description, banner, and gallery. This is what visitors see when the project is shown on the site.
+          </p>
           <label className="block text-sm md:col-span-2">
             <span className="font-medium text-slate-700">Summary</span>
             <textarea
@@ -291,6 +311,132 @@ export default function ProjectManager({
               placeholder="Shipped surface after the engagement"
             />
           </label>
+          <div className="flex flex-wrap items-center gap-6 md:col-span-2">
+            <label className="inline-flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={editing.published}
+                onChange={(event) =>
+                  setEditing({ ...editing, published: event.target.checked })
+                }
+              />
+              Show on the website
+            </label>
+            <label className="inline-flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={editing.featured}
+                onChange={(event) =>
+                  setEditing({ ...editing, featured: event.target.checked })
+                }
+              />
+              Feature on the homepage
+            </label>
+          </div>
+          <div className="md:col-span-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <p className="font-medium text-slate-900">Banner and gallery</p>
+                <p className="text-sm text-slate-500">
+                  The first image is the banner on the website. The rest are gallery images.
+                  Reorder or set the banner, then save. JPG, PNG, WebP — max 8MB each.
+                </p>
+              </div>
+              <label className="inline-flex items-center gap-2 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 cursor-pointer hover:border-emerald-300">
+                <Upload className="w-4 h-4" />
+                {uploading ? "Uploading…" : "Upload files"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                  multiple
+                  className="hidden"
+                  disabled={uploading}
+                  onChange={(event) => {
+                    void uploadFiles(event.target.files);
+                    event.target.value = "";
+                  }}
+                />
+              </label>
+            </div>
+            {editing.images.length ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {editing.images.map((image, index) => (
+                  <div
+                    key={`${image}-${index}`}
+                    className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-white"
+                  >
+                    <Image
+                      src={image}
+                      alt="Project attachment"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                    {index === 0 ? (
+                      <span className="absolute top-2 left-2 rounded-full bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1">
+                        Banner
+                      </span>
+                    ) : null}
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-slate-900/70 p-1.5">
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => moveImage(index, -1)}
+                          disabled={index === 0}
+                          className="rounded-md bg-white/15 text-white p-1 disabled:opacity-30"
+                          aria-label="Move image earlier"
+                        >
+                          <ArrowUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveImage(index, 1)}
+                          disabled={index === editing.images.length - 1}
+                          className="rounded-md bg-white/15 text-white p-1 disabled:opacity-30"
+                          aria-label="Move image later"
+                        >
+                          <ArrowDown className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCoverImage(index)}
+                          disabled={index === 0}
+                          className="rounded-md bg-white/15 text-white p-1 disabled:opacity-30"
+                          aria-label="Set as banner"
+                          title="Set as banner"
+                        >
+                          <Star className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeImage(image)}
+                        className="rounded-md bg-white/15 text-white p-1"
+                        aria-label="Remove image"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">No images yet.</p>
+            )}
+          </div>
+          <h3 className="md:col-span-2 font-semibold text-slate-900 pt-2">Project management</h3>
+          <p className="md:col-span-2 text-sm text-slate-500 -mt-2">
+            Company, contract value, receipts, phases, and who is assigned. Hidden from the public site.
+          </p>
+          <label className="block text-sm">
+            <span className="font-medium text-slate-700">Company</span>
+            <input
+              value={editing.company ?? ""}
+              onChange={(event) => setEditing({ ...editing, company: event.target.value })}
+              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+              placeholder="Client company"
+            />
+          </label>
           <label className="block text-sm">
             <span className="font-medium text-slate-700">Status</span>
             <select
@@ -305,49 +451,10 @@ export default function ProjectManager({
             >
               {statuses.map((status) => (
                 <option key={status} value={status}>
-                  {status}
+                  {statusLabels[status]}
                 </option>
               ))}
             </select>
-          </label>
-          <div className="flex items-center gap-6 pt-6">
-            <label className="inline-flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={editing.published}
-                onChange={(event) =>
-                  setEditing({ ...editing, published: event.target.checked })
-                }
-              />
-              Published on site
-            </label>
-            <label className="inline-flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={editing.featured}
-                onChange={(event) =>
-                  setEditing({ ...editing, featured: event.target.checked })
-                }
-              />
-              Featured
-            </label>
-          </div>
-          <label className="block text-sm">
-            <span className="font-medium text-slate-700">Deal value (USD)</span>
-            <input
-              inputMode="decimal"
-              value={editing.dealValue ?? ""}
-              onChange={(event) => {
-                const raw = event.target.value.trim();
-                const dealValue = raw === "" ? undefined : Number(raw);
-                setEditing({
-                  ...editing,
-                  dealValue: Number.isFinite(dealValue) ? dealValue : undefined,
-                });
-              }}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
-              placeholder="15000"
-            />
           </label>
           <label className="block text-sm">
             <span className="font-medium text-slate-700">Next action</span>
@@ -360,6 +467,11 @@ export default function ProjectManager({
               placeholder="Send the scope note"
             />
           </label>
+          <ProjectAccounts
+            editing={editing}
+            team={team}
+            onChange={setEditing}
+          />
           <div className="md:col-span-2 rounded-2xl border border-slate-200 p-4">
             <p className="font-medium text-slate-900 mb-3">Tasks</p>
             <ul className="space-y-2 mb-3">
@@ -458,98 +570,6 @@ export default function ProjectManager({
             />
           </label>
 
-          <div className="md:col-span-2 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <div>
-                <p className="font-medium text-slate-900">Project images</p>
-                <p className="text-sm text-slate-500">
-                  First image is the cover. Reorder or set cover before saving.
-                  JPG, PNG, WebP — max 8MB each.
-                </p>
-              </div>
-              <label className="inline-flex items-center gap-2 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 cursor-pointer hover:border-emerald-300">
-                <Upload className="w-4 h-4" />
-                {uploading ? "Uploading…" : "Upload files"}
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
-                  multiple
-                  className="hidden"
-                  disabled={uploading}
-                  onChange={(event) => {
-                    void uploadFiles(event.target.files);
-                    event.target.value = "";
-                  }}
-                />
-              </label>
-            </div>
-            {editing.images.length ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                {editing.images.map((image, index) => (
-                  <div
-                    key={`${image}-${index}`}
-                    className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-white"
-                  >
-                    <Image
-                      src={image}
-                      alt="Project attachment"
-                      fill
-                      unoptimized
-                      className="object-cover"
-                    />
-                    {index === 0 ? (
-                      <span className="absolute top-2 left-2 rounded-full bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1">
-                        Cover
-                      </span>
-                    ) : null}
-                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-slate-900/70 p-1.5">
-                      <div className="flex gap-1">
-                        <button
-                          type="button"
-                          onClick={() => moveImage(index, -1)}
-                          disabled={index === 0}
-                          className="rounded-md bg-white/15 text-white p-1 disabled:opacity-30"
-                          aria-label="Move image earlier"
-                        >
-                          <ArrowUp className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => moveImage(index, 1)}
-                          disabled={index === editing.images.length - 1}
-                          className="rounded-md bg-white/15 text-white p-1 disabled:opacity-30"
-                          aria-label="Move image later"
-                        >
-                          <ArrowDown className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setCoverImage(index)}
-                          disabled={index === 0}
-                          className="rounded-md bg-white/15 text-white p-1 disabled:opacity-30"
-                          aria-label="Set as cover image"
-                          title="Set as cover"
-                        >
-                          <Star className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeImage(image)}
-                        className="rounded-md bg-white/15 text-white p-1"
-                        aria-label="Remove image"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-slate-500">No images yet.</p>
-            )}
-          </div>
-
           {error ? (
             <p className="md:col-span-2 text-sm text-red-600">{error}</p>
           ) : null}
@@ -572,13 +592,15 @@ export default function ProjectManager({
         </form>
       ) : null}
 
-      <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden">
+      <div className="rounded-2xl bg-white border border-slate-200 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left text-slate-500">
             <tr>
               <th className="px-4 py-3 font-semibold">Project</th>
               <th className="px-4 py-3 font-semibold">Status</th>
-              <th className="px-4 py-3 font-semibold">Published</th>
+              <th className="px-4 py-3 font-semibold">Received</th>
+              <th className="px-4 py-3 font-semibold">Remaining</th>
+              <th className="px-4 py-3 font-semibold">On site</th>
               <th className="px-4 py-3 font-semibold">Actions</th>
             </tr>
           </thead>
@@ -587,10 +609,12 @@ export default function ProjectManager({
               <tr key={project.id} className="border-t border-slate-100">
                 <td className="px-4 py-3">
                   <p className="font-semibold text-slate-900">{project.title}</p>
-                  <p className="text-slate-500">{project.category}</p>
+                  <p className="text-slate-500">{project.company?.trim() || project.category}</p>
                 </td>
-                <td className="px-4 py-3 capitalize">{project.status}</td>
-                <td className="px-4 py-3">{project.published ? "Yes" : "No"}</td>
+                <td className="px-4 py-3">{statusLabels[project.status]}</td>
+                <td className="px-4 py-3">{money(receivedOf(project))}</td>
+                <td className="px-4 py-3">{money(remainingOf(project))}</td>
+                <td className="px-4 py-3">{project.published ? "Shown" : "Hidden"}</td>
                 <td className="px-4 py-3 space-x-3">
                   <button
                     type="button"

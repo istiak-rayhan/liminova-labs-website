@@ -6,6 +6,13 @@ import type { CmsTeamMember, TeamRole } from "@/lib/cms-types";
 
 const roles: TeamRole[] = ["developer", "partner", "operations", "leadership"];
 
+const roleLabels: Record<TeamRole, string> = {
+  developer: "Developer",
+  partner: "Partner",
+  operations: "Operations",
+  leadership: "Leadership",
+};
+
 export default function TeamManager({
   initialTeam,
 }: {
@@ -130,7 +137,7 @@ export default function TeamManager({
             >
               {roles.map((role) => (
                 <option key={role} value={role}>
-                  {role}
+                  {roleLabels[role]}
                 </option>
               ))}
             </select>
@@ -185,7 +192,7 @@ export default function TeamManager({
               <div>
                 <p className="font-semibold text-slate-900">{member.name}</p>
                 <p className="text-sm text-slate-500">
-                  {member.title} · {member.role}
+                  {member.title} · {roleLabels[member.role]}
                 </p>
               </div>
               <span

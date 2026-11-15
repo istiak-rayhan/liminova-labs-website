@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCmsStore } from "@/lib/cms";
-import { buildReport } from "@/lib/report";
+import { money } from "@/lib/finance";
+import { buildReport, leadStages } from "@/lib/report";
 
 export default async function AdminOverviewPage() {
   const store = await getCmsStore();
@@ -8,19 +9,20 @@ export default async function AdminOverviewPage() {
   const team = store.team.filter((member) => member.active).length;
 
   const cards = [
-    { label: "New briefs", value: report.byStage.new, href: "/admin/leads" },
-    { label: "Briefs, 30 days", value: report.last30, href: "/admin/reports" },
-    { label: "Pipeline", value: report.byStatus.pipeline, href: "/admin/projects?status=pipeline" },
-    { label: "Ongoing", value: report.byStatus.ongoing, href: "/admin/projects?status=ongoing" },
-    { label: "Live on site", value: report.published, href: "/portfolio" },
-    { label: "Active team", value: team, href: "/admin/team" },
+    { label: "Earned so far", value: money(report.earned), href: "/admin/reports" },
+    { label: "Last 7 days", value: money(report.weekIncome), href: "/admin/business" },
+    { label: "Still to collect", value: money(report.toCollect), href: "/admin/reports" },
+    { label: "New briefs", value: String(report.byStage.new), href: "/admin/leads" },
+    { label: "In progress", value: String(report.byStatus.ongoing), href: "/admin/projects?status=ongoing" },
+    { label: "Shown on the site", value: String(report.published), href: "/portfolio" },
+    { label: "Active team", value: String(team), href: "/admin/team" },
   ];
 
   return (
     <div>
       <h1 className="font-display text-3xl font-bold text-slate-900 mb-2">Dashboard</h1>
       <p className="text-slate-500 mb-8">
-        Briefs, delivery, and what is published. Figures are from this studio only.
+        Briefs, delivery, and the money recorded on projects. Figures are from this studio only.
       </p>
       <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
         {cards.map((card) => (
@@ -53,7 +55,7 @@ export default async function AdminOverviewPage() {
                     {lead.name} · {lead.company}
                   </p>
                   <p className="text-sm text-slate-500">
-                    {lead.projectType} · {lead.stage}
+                    {lead.projectType} · {leadStages.find((stage) => stage.id === lead.stage)?.label}
                   </p>
                 </li>
               ))}

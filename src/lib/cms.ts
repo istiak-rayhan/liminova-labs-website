@@ -55,14 +55,15 @@ async function writeLocal(store: CmsStore) {
   await fs.writeFile(LOCAL_PATH, JSON.stringify(store, null, 2), "utf8");
 }
 
-async function readBlob(): Promise<CmsStore | null> {
+async function readBlob(): Promise<{ store: CmsStore | null; failed: boolean }> {
   try {
     const result = await get(BLOB_KEY, { access: "private", useCache: false });
-    if (!result?.stream) return null;
+    if (!result?.stream) return { store: null, failed: false };
     const raw = await streamToString(result.stream);
-    return JSON.parse(raw) as CmsStore;
+    return { store: JSON.parse(raw) as CmsStore, failed: false };
   } catch {
-    return null;
+    console.error("CMS store could not be read. Serving the public site from the built-in portfolio.");
+    return { store: null, failed: true };
   }
 }
 
@@ -156,18 +157,36 @@ function remember(store: CmsStore) {
   memory = { at: Date.now(), store: structuredClone(store) };
 }
 
-async function loadStore(): Promise<CmsStore> {
-  const existing = hasBlob() ? await readBlob() : await readLocal();
-  if (existing?.version === 1) {
-    const normalized = normalizeStore(existing);
-    const enriched = enrichFromSeed(normalized.store);
-    const store = enriched.store;
-    if (normalized.changed || enriched.changed) return saveCmsStore(store);
+function finishLoad(store: CmsStore, persist: boolean) {
+  if (!persist) {
     remember(store);
     return store;
   }
-  const seeded = createSeedStore();
-  return saveCmsStore(seeded);
+  return saveCmsStore(store).catch(() => {
+    remember(store);
+    return store;
+  });
+}
+
+async function loadStore(): Promise<CmsStore> {
+  if (hasBlob()) {
+    const read = await readBlob();
+    if (read.failed) return finishLoad(createSeedStore(), false);
+    if (read.store?.version === 1) {
+      const normalized = normalizeStore(read.store);
+      const enriched = enrichFromSeed(normalized.store);
+      return finishLoad(enriched.store, normalized.changed || enriched.changed);
+    }
+    return finishLoad(createSeedStore(), true);
+  }
+
+  const existing = await readLocal();
+  if (existing?.version === 1) {
+    const normalized = normalizeStore(existing);
+    const enriched = enrichFromSeed(normalized.store);
+    return finishLoad(enriched.store, normalized.changed || enriched.changed);
+  }
+  return finishLoad(createSeedStore(), true);
 }
 
 export async function getCmsStore(): Promise<CmsStore> {

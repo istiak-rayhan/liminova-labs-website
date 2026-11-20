@@ -66,6 +66,7 @@ export function createSeedStore(): CmsStore {
     projects: seedProjects(),
     team: seedTeam(),
     leads: [],
+    outreach: [],
     payouts: [],
     investments: [],
     updatedAt: now(),

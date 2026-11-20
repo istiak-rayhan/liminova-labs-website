@@ -118,11 +118,36 @@ export type CmsLead = {
   updatedAt: string;
 };
 
+/** A collected prospect worked from the leadership outreach desk. */
+export type CmsOutreach = {
+  id: string;
+  company: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  source: string;
+  /** Private notes: portals, logins, or who can approve. Leadership only. */
+  credentials: string;
+  approach: string;
+  firstMailSent: boolean;
+  firstMailDate: string;
+  secondMailSent: boolean;
+  secondMailDate: string;
+  responded: boolean;
+  aligned: boolean;
+  converted: boolean;
+  wasted: boolean;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type CmsStore = {
   version: 1;
   projects: CmsProject[];
   team: CmsTeamMember[];
   leads: CmsLead[];
+  outreach: CmsOutreach[];
   payouts: CmsPayout[];
   investments: CmsInvestment[];
   updatedAt: string;

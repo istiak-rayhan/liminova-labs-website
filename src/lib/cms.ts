@@ -7,6 +7,7 @@ import { createSeedStore } from "@/lib/cms-seed";
 import type {
   CmsInvestment,
   CmsLead,
+  CmsOutreach,
   CmsPayout,
   CmsProject,
   CmsStore,
@@ -14,6 +15,7 @@ import type {
   ProjectStatus,
   PublicTeamMember,
 } from "@/lib/cms-types";
+import type { OutreachDraft } from "@/lib/outreach";
 import type { Project } from "@/data/projects";
 
 const BLOB_KEY = "cms/store.json";
@@ -84,6 +86,8 @@ function normalizeStore(store: CmsStore): { store: CmsStore; changed: boolean } 
   if (!Array.isArray(store.payouts)) changed = true;
   const investments = Array.isArray(store.investments) ? store.investments : [];
   if (!Array.isArray(store.investments)) changed = true;
+  const outreach = Array.isArray(store.outreach) ? store.outreach : [];
+  if (!Array.isArray(store.outreach)) changed = true;
 
   const projects = store.projects.map((project) => {
     const tasks = Array.isArray(project.tasks) ? project.tasks : [];
@@ -118,7 +122,7 @@ function normalizeStore(store: CmsStore): { store: CmsStore; changed: boolean } 
   });
 
   return {
-    store: { ...store, leads, payouts, investments, projects },
+    store: { ...store, leads, payouts, investments, outreach, projects },
     changed,
   };
 }
@@ -378,6 +382,41 @@ export async function addPayout(input: Omit<CmsPayout, "id">) {
 export async function deletePayout(id: string) {
   const store = await getCmsStore();
   store.payouts = (store.payouts ?? []).filter((item) => item.id !== id);
+  await saveCmsStore(store);
+}
+
+export async function createOutreach(input: OutreachDraft) {
+  const store = await getCmsStore();
+  const stamped = new Date().toISOString();
+  const lead: CmsOutreach = {
+    ...input,
+    id: `out_${Date.now().toString(36)}`,
+    createdAt: stamped,
+    updatedAt: stamped,
+  };
+  store.outreach = [lead, ...(store.outreach ?? [])];
+  await saveCmsStore(store);
+  return lead;
+}
+
+export async function updateOutreach(id: string, input: OutreachDraft) {
+  const store = await getCmsStore();
+  const index = (store.outreach ?? []).findIndex((lead) => lead.id === id);
+  if (index < 0) return null;
+  const current = store.outreach[index];
+  const next: CmsOutreach = {
+    ...current,
+    ...input,
+    updatedAt: new Date().toISOString(),
+  };
+  store.outreach[index] = next;
+  await saveCmsStore(store);
+  return next;
+}
+
+export async function deleteOutreach(id: string) {
+  const store = await getCmsStore();
+  store.outreach = (store.outreach ?? []).filter((lead) => lead.id !== id);
   await saveCmsStore(store);
 }
 

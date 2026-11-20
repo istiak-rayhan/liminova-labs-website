@@ -9,6 +9,7 @@ import {
   LogOut,
   ExternalLink,
   Inbox,
+  Send,
   BarChart3,
   Search,
   Wallet,
@@ -19,6 +20,7 @@ import type { TeamRole } from "@/lib/cms-types";
 const links: { href: string; label: string; icon: typeof LayoutDashboard; area: DashboardArea }[] = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, area: "overview" },
   { href: "/admin/leads", label: "Leads", icon: Inbox, area: "leads" },
+  { href: "/admin/outreach", label: "Cold outreach", icon: Send, area: "outreach" },
   { href: "/admin/projects", label: "Projects", icon: FolderKanban, area: "projects" },
   { href: "/admin/business", label: "Business", icon: Wallet, area: "business" },
   { href: "/admin/reports", label: "Reports", icon: BarChart3, area: "reports" },

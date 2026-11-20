@@ -86,14 +86,16 @@ export default function BookingCalendar({ slots }: { slots: Slot[] }) {
                     key={slot.id}
                     type="button"
                     onClick={() => setSlotId(slot.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium border ${
+                    aria-pressed={active}
+                    aria-label={slot.label}
+                    className={`px-4 py-2 rounded-2xl text-sm font-medium border text-left ${
                       active
                         ? "bg-emerald-500 border-emerald-500 text-white"
                         : "bg-white border-slate-200 text-slate-700 hover:border-emerald-300"
                     }`}
-                    aria-pressed={active}
                   >
-                    {slot.time}
+                    <span className="block">{slot.time}</span>
+                    <span className={`block text-xs ${active ? "text-emerald-50" : "text-slate-500"}`}>{slot.uk}</span>
                   </button>
                 );
               })}
@@ -101,7 +103,10 @@ export default function BookingCalendar({ slots }: { slots: Slot[] }) {
           </div>
         ))}
       </div>
-      <p className="text-sm text-slate-500">Times are Dhaka (UTC+6). Each call is 30 minutes.</p>
+      <p className="text-sm text-slate-500">
+        Each call is 30 minutes. The first line is US Eastern. The second is UK time, and Central Europe is one hour
+        later.
+      </p>
       <div className="grid sm:grid-cols-2 gap-4">
         <label className="block text-sm font-medium text-slate-700">
           Name

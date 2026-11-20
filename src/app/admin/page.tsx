@@ -20,6 +20,11 @@ export default async function AdminOverviewPage() {
         { label: "Last 7 days", value: money(report.weekIncome), href: "/admin/business" },
         { label: "Still to collect", value: money(report.toCollect), href: "/admin/reports" },
         { label: "New briefs", value: String(report.byStage.new), href: "/admin/leads" },
+        {
+          label: "Outreach in play",
+          value: String((store.outreach ?? []).filter((lead) => !lead.converted && !lead.wasted).length),
+          href: "/admin/outreach",
+        },
         { label: "In progress", value: String(report.byStatus.ongoing), href: "/admin/projects?status=ongoing" },
         { label: "Shown on the site", value: String(report.published), href: "/portfolio" },
         { label: "Active team", value: String(store.team.filter((member) => member.active).length), href: "/admin/team" },

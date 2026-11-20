@@ -3,6 +3,7 @@ import type { TeamRole } from "@/lib/cms-types";
 export type DashboardArea =
   | "overview"
   | "leads"
+  | "outreach"
   | "projects"
   | "business"
   | "reports"
@@ -19,14 +20,14 @@ export const roleLabels: Record<TeamRole, string> = {
 };
 
 export const roleAccess: Record<TeamRole, string> = {
-  leadership: "Full dashboard. Business, reports, team, and logins included.",
+  leadership: "Full dashboard. Cold outreach, business, reports, team, and logins included.",
   operations: "Edit projects. Business, reports, and team stay closed.",
   partner: "Work the lead pipeline and view projects. No money pages.",
   developer: "Update tasks on projects assigned to you.",
 };
 
 const visible: Record<TeamRole, DashboardArea[]> = {
-  leadership: ["overview", "leads", "projects", "business", "reports", "team", "search"],
+  leadership: ["overview", "leads", "outreach", "projects", "business", "reports", "team", "search"],
   operations: ["overview", "projects"],
   partner: ["overview", "leads", "projects"],
   developer: ["overview", "projects"],
@@ -55,5 +56,9 @@ export function canEditLeads(role: TeamRole) {
 }
 
 export function canManageTeam(role: TeamRole) {
+  return role === "leadership";
+}
+
+export function canManageOutreach(role: TeamRole) {
   return role === "leadership";
 }

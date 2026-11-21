@@ -205,7 +205,7 @@ export default function OutreachDesk({ initialLeads }: { initialLeads: CmsOutrea
         <h1 className="font-display text-3xl font-semibold text-slate-900">Cold outreach</h1>
         <p className="text-slate-500 mt-1 max-w-2xl">
           Collected leads stay here. Track the first and second mail, the approach, private credentials, and whether
-          they responded, aligned, converted, or were wasted. Leadership only.
+          they responded, aligned, converted, or were wasted. Leadership and operations.
         </p>
       </div>
 

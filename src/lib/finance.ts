@@ -81,3 +81,19 @@ export function monthStart(today = todayInDhaka()) {
 export function weekStart(today = todayInDhaka()) {
   return shiftDate(today, -6);
 }
+
+export function recentWeekIncome(projects: CmsProject[], weeks = 8, now = new Date()) {
+  const today = todayInDhaka(now);
+  const rows: { label: string; value: number }[] = [];
+  for (let index = weeks - 1; index >= 0; index -= 1) {
+    const end = shiftDate(today, -index * 7);
+    const start = shiftDate(end, -6);
+    const label = new Intl.DateTimeFormat("en-GB", {
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    }).format(new Date(`${end}T00:00:00Z`));
+    rows.push({ label, value: incomeBetween(projects, start, end) });
+  }
+  return rows;
+}

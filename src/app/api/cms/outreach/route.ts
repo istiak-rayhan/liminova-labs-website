@@ -4,14 +4,14 @@ import { getAdminSession } from "@/lib/auth";
 import { createOutreach, deleteOutreach, updateOutreach } from "@/lib/cms";
 import { sanitizeOutreach } from "@/lib/outreach";
 
-async function leadershipOnly() {
+async function allowed() {
   const session = await getAdminSession();
   if (!session || !canManageOutreach(session.role)) return null;
   return session;
 }
 
 export async function POST(request: Request) {
-  if (!(await leadershipOnly())) {
+  if (!(await allowed())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  if (!(await leadershipOnly())) {
+  if (!(await allowed())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const id = new URL(request.url).searchParams.get("id");

@@ -92,7 +92,7 @@ export default function BusinessDesk({
       <section className="rounded-2xl bg-white border border-slate-200 p-6">
         <h2 className="font-semibold text-slate-900">Investment</h2>
         <p className="text-sm text-slate-500 mt-1 mb-4">
-          Record what the studio spends. Income above comes only from project receipts.
+          Record what the company spends. Income above comes only from project receipts.
         </p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
           <label className="text-sm">

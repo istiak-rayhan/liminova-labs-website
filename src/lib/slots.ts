@@ -150,3 +150,44 @@ export function upcomingSlots(now = new Date(), days = 6): Slot[] {
 export function findSlot(id: string, now = new Date()) {
   return upcomingSlots(now).find((slot) => slot.id === id) ?? null;
 }
+
+export const clientZones = [
+  { id: "America/New_York", label: "US Eastern" },
+  { id: "America/Chicago", label: "US Central" },
+  { id: "America/Denver", label: "US Mountain" },
+  { id: "America/Los_Angeles", label: "US Pacific" },
+  { id: "Europe/London", label: "United Kingdom" },
+  { id: "Europe/Berlin", label: "Central Europe" },
+  { id: "Asia/Dhaka", label: "Bangladesh" },
+] as const;
+
+export const defaultClientZone = "America/New_York";
+
+export function slotDateKey(iso: string, timeZone: string) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(iso));
+}
+
+export function slotDateLabel(iso: string, timeZone: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone,
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+  }).format(new Date(iso));
+}
+
+export function slotClock(iso: string, timeZone: string) {
+  const start = new Date(iso);
+  const end = new Date(start.getTime() + CALL_MS);
+  const format = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  return `${format.format(start)}–${format.format(end)}`;
+}

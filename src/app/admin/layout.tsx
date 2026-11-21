@@ -16,9 +16,9 @@ export default async function AdminLayout({
   if (!session) redirect("/login");
 
   return (
-    <div className="h-dvh overflow-hidden bg-slate-100 flex flex-col lg:flex-row">
+    <div className="flex h-dvh flex-col overflow-hidden bg-[#e7efe9] lg:flex-row">
       <AdminNav email={session.email} role={session.role} />
-      <div className="flex-1 min-h-0 min-w-0 overflow-y-auto p-6 lg:p-10">{children}</div>
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</div>
     </div>
   );
 }

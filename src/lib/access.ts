@@ -20,16 +20,16 @@ export const roleLabels: Record<TeamRole, string> = {
 };
 
 export const roleAccess: Record<TeamRole, string> = {
-  leadership: "Full dashboard. Cold outreach, business, reports, team, and logins included.",
-  operations: "Edit projects. Business, reports, and team stay closed.",
-  partner: "Work the lead pipeline and view projects. No money pages.",
-  developer: "Update tasks on projects assigned to you.",
+  leadership: "Everything: leads, cold outreach, pipeline, money, reports, and team logins.",
+  operations: "Edit projects already in progress: showcase, tasks, and the next step. No leads, pipeline, or money.",
+  partner: "See projects you are named on. No leads, pipeline, or money.",
+  developer: "Update tasks and the next step on projects assigned to you.",
 };
 
 const visible: Record<TeamRole, DashboardArea[]> = {
   leadership: ["overview", "leads", "outreach", "projects", "business", "reports", "team", "search"],
   operations: ["overview", "projects"],
-  partner: ["overview", "leads", "projects"],
+  partner: ["overview", "projects"],
   developer: ["overview", "projects"],
 };
 
@@ -43,7 +43,19 @@ export function canView(role: TeamRole, area: DashboardArea) {
   return visible[role].includes(area);
 }
 
+export function canSeeFinance(role: TeamRole) {
+  return role === "leadership";
+}
+
+export function canSeePipeline(role: TeamRole) {
+  return role === "leadership";
+}
+
 export function canManageProjects(role: TeamRole) {
+  return role === "leadership";
+}
+
+export function canEditDelivery(role: TeamRole) {
   return role === "leadership" || role === "operations";
 }
 
@@ -52,7 +64,7 @@ export function canEditOwnTasks(role: TeamRole) {
 }
 
 export function canEditLeads(role: TeamRole) {
-  return role === "leadership" || role === "partner";
+  return role === "leadership";
 }
 
 export function canManageTeam(role: TeamRole) {

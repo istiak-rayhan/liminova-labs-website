@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { canView } from "@/lib/access";
+import { canSeeFinance, canView } from "@/lib/access";
 import { getCmsStore } from "@/lib/cms";
 import { money } from "@/lib/finance";
 import { requireArea } from "@/lib/guard";
@@ -9,10 +9,12 @@ export default async function AdminOverviewPage() {
   const session = await requireArea("overview");
   const store = await getCmsStore();
   const report = buildReport(store);
-  const leadership = session.role === "leadership";
-  const assigned = store.projects.filter((project) =>
+  const leadership = canSeeFinance(session.role);
+  const delivery = store.projects.filter((project) => project.status !== "pipeline");
+  const assigned = delivery.filter((project) =>
     project.shares?.some((share) => share.memberId === session.memberId),
   );
+  const ownWork = session.role === "operations" ? delivery : assigned;
 
   const cards = leadership
     ? [
@@ -26,29 +28,22 @@ export default async function AdminOverviewPage() {
           href: "/admin/outreach",
         },
         { label: "In progress", value: String(report.byStatus.ongoing), href: "/admin/projects?status=ongoing" },
+        { label: "Pipeline", value: String(report.byStatus.pipeline), href: "/admin/projects?status=pipeline" },
         { label: "Shown on the site", value: String(report.published), href: "/portfolio" },
         { label: "Active team", value: String(store.team.filter((member) => member.active).length), href: "/admin/team" },
       ]
     : [
-        canView(session.role, "leads")
-          ? { label: "New briefs", value: String(report.byStage.new), href: "/admin/leads" }
-          : null,
         {
-          label: session.role === "developer" ? "Assigned to you" : "In progress",
-          value: String(session.role === "developer" ? assigned.length : report.byStatus.ongoing),
+          label: session.role === "operations" ? "In progress" : "Assigned to you",
+          value: String(ownWork.filter((project) => project.status === "ongoing").length),
           href: "/admin/projects",
         },
-        canView(session.role, "projects")
-          ? { label: "Pipeline", value: String(report.byStatus.pipeline), href: "/admin/projects?status=pipeline" }
-          : null,
-      ].filter((card): card is { label: string; value: string; href: string } => card !== null);
+      ];
 
-  const actions =
-    session.role === "developer"
-      ? assigned
-          .filter((project) => project.nextAction?.trim())
-          .map((project) => ({ id: project.id, title: project.title, nextAction: project.nextAction!.trim() }))
-      : report.nextActions;
+  const actions = ownWork
+    .filter((project) => project.status === "ongoing" && project.nextAction?.trim())
+    .map((project) => ({ id: project.id, title: project.title, nextAction: project.nextAction!.trim() }));
+  const shownActions = leadership ? report.nextActions : actions;
 
   return (
     <div>
@@ -56,7 +51,7 @@ export default async function AdminOverviewPage() {
       <p className="text-slate-500 mb-8">
         {leadership
           ? "Briefs, delivery, and the money recorded on projects. Figures are from this studio only."
-          : "Your section of the studio dashboard. Money, reports, and team logins stay with leadership."}
+          : "Your delivery desk. Leads, cold outreach, pipeline, and money stay with leadership."}
       </p>
       <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
         {cards.map((card) => (
@@ -105,11 +100,11 @@ export default async function AdminOverviewPage() {
               Projects
             </Link>
           </div>
-          {actions.length === 0 ? (
+          {shownActions.length === 0 ? (
             <p className="text-sm text-slate-500">Nothing waiting on a next step.</p>
           ) : (
             <ul className="space-y-3">
-              {actions.slice(0, 5).map((item) => (
+              {shownActions.slice(0, 5).map((item) => (
                 <li key={item.id}>
                   <p className="font-medium text-slate-900">{item.title}</p>
                   <p className="text-sm text-slate-500">{item.nextAction}</p>

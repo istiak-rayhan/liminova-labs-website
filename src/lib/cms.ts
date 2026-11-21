@@ -305,6 +305,19 @@ export async function deleteTeamMember(id: string) {
   await saveCmsStore(store);
 }
 
+export function withoutCommercial<T extends CmsProject>(project: T): T {
+  return {
+    ...project,
+    company: "",
+    quotation: "",
+    finalizedValue: undefined,
+    dealValue: undefined,
+    phases: [],
+    receipts: [],
+    shares: [],
+  };
+}
+
 export function newProjectId() {
   return `proj_${Date.now().toString(36)}`;
 }

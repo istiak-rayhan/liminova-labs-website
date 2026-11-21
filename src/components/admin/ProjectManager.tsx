@@ -59,7 +59,7 @@ export default function ProjectManager({
   initialProjects: CmsProject[];
   team: CmsTeamMember[];
   filter?: ProjectStatus;
-  capability?: "manage" | "tasks" | "view";
+  capability?: "manage" | "delivery" | "tasks" | "view";
 }) {
   const router = useRouter();
   const [projects, setProjects] = useState(initialProjects);
@@ -221,9 +221,11 @@ export default function ProjectManager({
           <p className="text-slate-500 mt-1">
             {capability === "manage"
               ? "Website showcase and the private accounts for each engagement live here. Uncheck “Show on the website” to hide a project from the live site."
-              : capability === "tasks"
-                ? "These are the projects assigned to you. Edit updates the next step and tasks only."
-                : "Project list for your role. Editing accounts and publishing is limited to leadership and operations."}
+              : capability === "delivery"
+                ? "Showcase, tasks, and the next step for work already in progress. Pipeline and money stay with leadership."
+                : capability === "tasks"
+                  ? "These are the projects assigned to you. Edit updates the next step and tasks only."
+                  : "Projects you are named on. Pipeline and money stay with leadership."}
           </p>
         </div>
         {capability === "manage" ? (
@@ -328,7 +330,7 @@ export default function ProjectManager({
         </form>
       ) : null}
 
-      {editing && capability === "manage" ? (
+      {editing && (capability === "manage" || capability === "delivery") ? (
         <form
           onSubmit={save}
           className="rounded-2xl bg-white border border-slate-200 p-6 grid md:grid-cols-2 gap-4"
@@ -349,7 +351,9 @@ export default function ProjectManager({
               ["quotation", "Quotation notes"],
               ["liveUrl", "Live URL"],
             ] as const
-          ).map(([key, label]) => (
+          )
+            .filter(([key]) => capability === "manage" || key !== "quotation")
+            .map(([key, label]) => (
             <label key={key} className="block text-sm">
               <span className="font-medium text-slate-700">{label}</span>
               <input
@@ -522,19 +526,25 @@ export default function ProjectManager({
               <p className="text-sm text-slate-500">No images yet.</p>
             )}
           </div>
-          <h3 className="md:col-span-2 font-semibold text-slate-900 pt-2">Project management</h3>
-          <p className="md:col-span-2 text-sm text-slate-500 -mt-2">
-            Company, contract value, receipts, phases, and who is assigned. Hidden from the public site.
-          </p>
-          <label className="block text-sm">
-            <span className="font-medium text-slate-700">Company</span>
-            <input
-              value={editing.company ?? ""}
-              onChange={(event) => setEditing({ ...editing, company: event.target.value })}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
-              placeholder="Client company"
-            />
-          </label>
+          {capability === "manage" ? (
+            <>
+              <h3 className="md:col-span-2 font-semibold text-slate-900 pt-2">Project management</h3>
+              <p className="md:col-span-2 text-sm text-slate-500 -mt-2">
+                Company, contract value, receipts, phases, and who is assigned. Hidden from the public site.
+              </p>
+              <label className="block text-sm">
+                <span className="font-medium text-slate-700">Company</span>
+                <input
+                  value={editing.company ?? ""}
+                  onChange={(event) => setEditing({ ...editing, company: event.target.value })}
+                  className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
+                  placeholder="Client company"
+                />
+              </label>
+            </>
+          ) : (
+            <h3 className="md:col-span-2 font-semibold text-slate-900 pt-2">Delivery</h3>
+          )}
           <label className="block text-sm">
             <span className="font-medium text-slate-700">Status</span>
             <select
@@ -547,7 +557,7 @@ export default function ProjectManager({
               }
               className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2"
             >
-              {statuses.map((status) => (
+              {(capability === "delivery" ? (["ongoing", "completed"] as const) : statuses).map((status) => (
                 <option key={status} value={status}>
                   {statusLabels[status]}
                 </option>
@@ -565,11 +575,13 @@ export default function ProjectManager({
               placeholder="Send the scope note"
             />
           </label>
-          <ProjectAccounts
-            editing={editing}
-            team={team}
-            onChange={setEditing}
-          />
+          {capability === "manage" ? (
+            <ProjectAccounts
+              editing={editing}
+              team={team}
+              onChange={setEditing}
+            />
+          ) : null}
           <div className="md:col-span-2 rounded-2xl border border-slate-200 p-4">
             <p className="font-medium text-slate-900 mb-3">Tasks</p>
             <ul className="space-y-2 mb-3">
@@ -700,8 +712,10 @@ export default function ProjectManager({
                 <>
                   <th className="px-4 py-3 font-semibold">Received</th>
                   <th className="px-4 py-3 font-semibold">Remaining</th>
-                  <th className="px-4 py-3 font-semibold">On site</th>
                 </>
+              ) : null}
+              {capability === "manage" || capability === "delivery" ? (
+                <th className="px-4 py-3 font-semibold">On site</th>
               ) : null}
               {capability !== "view" ? <th className="px-4 py-3 font-semibold">Edit</th> : null}
             </tr>
@@ -718,10 +732,12 @@ export default function ProjectManager({
                   <>
                     <td className="px-4 py-3">{money(receivedOf(project))}</td>
                     <td className="px-4 py-3">{money(remainingOf(project))}</td>
-                    <td className="px-4 py-3">{project.published ? "Shown" : "Hidden"}</td>
                   </>
                 ) : null}
-                {capability !== "view" ? (
+                {capability === "manage" || capability === "delivery" ? (
+                  <td className="px-4 py-3">{project.published ? "Shown" : "Hidden"}</td>
+                ) : null}
+                {capability === "manage" || capability === "delivery" || capability === "tasks" ? (
                   <td className="px-4 py-3 space-x-3 whitespace-nowrap">
                     <button
                       type="button"

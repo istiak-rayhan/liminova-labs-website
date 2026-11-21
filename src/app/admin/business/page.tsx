@@ -1,6 +1,7 @@
+import BarList from "@/components/admin/BarList";
 import BusinessDesk from "@/components/admin/BusinessDesk";
 import { getCmsStore, toPublicTeamMember } from "@/lib/cms";
-import { money } from "@/lib/finance";
+import { money, recentWeekIncome } from "@/lib/finance";
 import { requireArea } from "@/lib/guard";
 import { buildReport } from "@/lib/report";
 
@@ -23,8 +24,28 @@ export default async function AdminBusinessPage() {
       <div>
         <h1 className="font-display text-3xl font-semibold text-slate-900">Business</h1>
         <p className="text-slate-500 mt-1">
-          Studio money only. Nothing here is estimated. Add a receipt on a project and it shows up as income.
+          Recorded money only. Nothing here is estimated. Add a receipt on a project and it shows up as income.
         </p>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <BarList
+          title="Collected against what is signed"
+          hint="Receipts beside the amount still owed on finalized work."
+          rows={[
+            { label: "Collected", value: report.earned, display: money(report.earned), bar: "bg-emerald-500" },
+            { label: "Still to collect", value: report.toCollect, display: money(report.toCollect), bar: "bg-amber-400" },
+          ]}
+        />
+        <BarList
+          title="Receipts by week"
+          hint="Eight weeks, dated in Dhaka. A quiet week is a real gap, not an estimate."
+          rows={recentWeekIncome(store.projects).map((week) => ({
+            label: week.label,
+            value: week.value,
+            display: money(week.value),
+            bar: "bg-emerald-500",
+          }))}
+        />
       </div>
       <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {cards.map((card) => (
@@ -36,17 +57,16 @@ export default async function AdminBusinessPage() {
         ))}
       </div>
       {report.bySection.length > 0 ? (
-        <section className="rounded-2xl bg-white border border-slate-200 p-6">
-          <h2 className="font-semibold text-slate-900 mb-3">Investment by section</h2>
-          <ul className="space-y-2 text-sm">
-            {report.bySection.map((row) => (
-              <li key={row.label} className="flex justify-between gap-4">
-                <span className="text-slate-700">{row.label}</span>
-                <span className="font-semibold text-slate-900">{money(row.amount)}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <BarList
+          title="Investment by section"
+          hint="Spend you recorded, grouped by the section you chose."
+          rows={report.bySection.map((row) => ({
+            label: row.label,
+            value: row.amount,
+            display: money(row.amount),
+            bar: "bg-slate-500",
+          }))}
+        />
       ) : null}
       <BusinessDesk
         projects={store.projects}

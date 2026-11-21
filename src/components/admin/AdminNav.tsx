@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { canView, roleLabels, type DashboardArea } from "@/lib/access";
 import type { TeamRole } from "@/lib/cms-types";
+import BrandLogo from "@/components/BrandLogo";
 
 const links: { href: string; label: string; icon: typeof LayoutDashboard; area: DashboardArea }[] = [
   { href: "/admin", label: "Today", icon: LayoutDashboard, area: "overview" },
@@ -33,7 +34,7 @@ const groups: { label: string; areas: DashboardArea[] }[] = [
   { label: "Business development", areas: ["leads", "outreach"] },
   { label: "Delivery", areas: ["projects"] },
   { label: "Company", areas: ["business", "reports", "team"] },
-  { label: "Studio", areas: ["search"] },
+  { label: "Website", areas: ["search"] },
 ];
 
 export default function AdminNav({ email, role }: { email: string; role: TeamRole }) {
@@ -57,12 +58,10 @@ export default function AdminNav({ email, role }: { email: string; role: TeamRol
     <aside className="flex max-h-[42vh] w-full shrink-0 flex-col overflow-hidden border-b border-emerald-950 bg-[#07140f] text-slate-100 lg:h-dvh lg:max-h-none lg:w-64 lg:border-b-0 lg:border-r">
       <div className="px-5 pb-4 pt-6">
         <div className="flex items-center gap-3">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-400 font-display text-sm font-bold text-slate-950">
-            L
-          </span>
+          <BrandLogo size={36} className="bg-white" />
           <div className="min-w-0">
-            <p className="font-display text-base font-bold leading-none">Liminova</p>
-            <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-emerald-200/70">Studio desk</p>
+            <p className="font-display text-base font-bold leading-none">Liminova Labs</p>
+            <p className="mt-1 text-[11px] text-emerald-200/80">Software and digital</p>
           </div>
         </div>
       </div>

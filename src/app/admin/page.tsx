@@ -1,9 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
-import { canSeeFinance, canView } from "@/lib/access";
+import BarList from "@/components/admin/BarList";
+import { canSeeFinance, canSeePipeline, canView } from "@/lib/access";
 import { getCmsStore } from "@/lib/cms";
 import type { CmsProject } from "@/lib/cms-types";
-import { money } from "@/lib/finance";
 import { requireArea } from "@/lib/guard";
+import { outcomeOf } from "@/lib/outreach";
 import { buildReport, leadStages } from "@/lib/report";
 
 function hourInDhaka(now: Date) {
@@ -35,11 +37,30 @@ function openTasks(projects: CmsProject[]) {
   );
 }
 
+const stageBars: Record<string, string> = {
+  new: "bg-sky-500",
+  contacted: "bg-cyan-500",
+  call: "bg-emerald-500",
+  proposal: "bg-amber-400",
+  won: "bg-emerald-700",
+  lost: "bg-rose-400",
+};
+
+const outcomeBars: Record<string, string> = {
+  open: "bg-slate-400",
+  responded: "bg-sky-500",
+  aligned: "bg-amber-400",
+  converted: "bg-emerald-500",
+  wasted: "bg-rose-400",
+};
+
 export default async function AdminOverviewPage() {
   const session = await requireArea("overview");
   const store = await getCmsStore();
   const report = buildReport(store);
   const leadership = canSeeFinance(session.role);
+  const pipeline = canSeePipeline(session.role);
+  const growth = canView(session.role, "leads");
   const delivery = store.projects.filter((project) => project.status !== "pipeline");
   const assigned = delivery.filter((project) =>
     project.shares?.some((share) => share.memberId === session.memberId),
@@ -50,30 +71,25 @@ export default async function AdminOverviewPage() {
       person.id === session.memberId ||
       (person.email && person.email.toLowerCase() === session.email.toLowerCase()),
   );
-  const firstName = member?.name.trim().split(/\s+/)[0];
+  const given = member?.name.trim().split(/\s+/)[0] ?? "";
+  const firstName = given && !/liminova/i.test(given) ? given : "";
   const greeting = `${greetingFor(new Date())}${firstName ? `, ${firstName}` : ""}`;
+  const taskCount = leadership ? report.openTasks.length : openTasks(ownWork).length;
+  const outreach = store.outreach ?? [];
+  const inPlay = outreach.filter((lead) => !lead.converted && !lead.wasted).length;
+  const unmailed = outreach.filter((lead) => !lead.firstMailSent && !lead.wasted).length;
 
-  const cards = leadership
+  const cards = growth
     ? [
         { label: "New briefs", value: String(report.byStage.new), hint: "Inbound, still new", href: "/admin/leads" },
-        {
-          label: "Outreach in play",
-          value: String((store.outreach ?? []).filter((lead) => !lead.converted && !lead.wasted).length),
-          hint: "Collected leads still open",
-          href: "/admin/outreach",
-        },
+        { label: "Outreach in play", value: String(inPlay), hint: "Collected leads still open", href: "/admin/outreach" },
         {
           label: "In progress",
           value: String(report.byStatus.ongoing),
           hint: "Projects being delivered",
           href: "/admin/projects?status=ongoing",
         },
-        {
-          label: "Still to collect",
-          value: money(report.toCollect),
-          hint: "Signed value minus receipts",
-          href: "/admin/reports",
-        },
+        { label: "Open tasks", value: String(taskCount), hint: "Unchecked work on active projects", href: "/admin/projects" },
       ]
     : [
         {
@@ -82,23 +98,19 @@ export default async function AdminOverviewPage() {
           hint: "Work you can move today",
           href: "/admin/projects",
         },
-        {
-          label: "Open tasks",
-          value: String(openTasks(ownWork).length),
-          hint: "Unchecked tasks on your projects",
-          href: "/admin/projects",
-        },
+        { label: "Open tasks", value: String(taskCount), hint: "Unchecked tasks on your projects", href: "/admin/projects" },
       ];
 
-  const quieter = leadership
-    ? [
-        { label: "Earned so far", value: money(report.earned), href: "/admin/reports" },
-        { label: "Last 7 days", value: money(report.weekIncome), href: "/admin/business" },
-        { label: "Pipeline", value: String(report.byStatus.pipeline), href: "/admin/projects?status=pipeline" },
-        { label: "On the site", value: String(report.published), href: "/portfolio" },
-        { label: "People", value: String(store.team.filter((person) => person.active).length), href: "/admin/team" },
-      ]
-    : [];
+  const openStage = leadStages
+    .filter((stage) => stage.id !== "won" && stage.id !== "lost")
+    .reduce((best, stage) => (report.byStage[stage.id] > report.byStage[best.id] ? stage : best));
+  const outcomeCounts = outreach.reduce(
+    (counts, lead) => {
+      counts[outcomeOf(lead)] += 1;
+      return counts;
+    },
+    { open: 0, responded: 0, aligned: 0, converted: 0, wasted: 0 },
+  );
 
   const actions = ownWork
     .filter((project) => project.status === "ongoing" && project.nextAction?.trim())
@@ -109,30 +121,43 @@ export default async function AdminOverviewPage() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <section className="relative overflow-hidden rounded-3xl bg-[#07140f] px-6 py-7 text-white md:px-8">
-        <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-emerald-400/15 blur-3xl" />
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300">Liminova Labs</p>
-        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-4xl">{greeting}.</h1>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-300 md:text-base">
-          {leadership
-            ? "Business development, delivery, money, and the people on the work. One desk for the studio."
-            : "Your delivery desk. Leads, cold outreach, pipeline, and money stay with leadership."}
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          {leadership ? (
-            <>
-              <Link href="/admin/leads" className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
-                Review briefs
+      <section className="relative overflow-hidden rounded-3xl bg-white ring-1 ring-slate-200/80">
+        <Image
+          src="/brand/overview-hero.jpg"
+          alt=""
+          fill
+          priority
+          sizes="(min-width: 1024px) 72rem, 100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/88 to-white/25" />
+        <div className="relative px-6 py-7 md:px-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Liminova Labs</p>
+          <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">{greeting}.</h1>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600 md:text-base">
+            {growth
+              ? "Business development and delivery. Money, and projects that have not started, stay with leadership."
+              : "Your delivery desk. Leads and cold outreach are with leadership and operations. Pipeline and money stay with leadership."}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {growth ? (
+              <>
+                <Link href="/admin/leads" className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white">
+                  Review briefs
+                </Link>
+                <Link
+                  href="/admin/outreach"
+                  className="rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200"
+                >
+                  Cold outreach
+                </Link>
+              </>
+            ) : (
+              <Link href="/admin/projects" className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white">
+                Open projects
               </Link>
-              <Link href="/admin/outreach" className="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white">
-                Cold outreach
-              </Link>
-            </>
-          ) : (
-            <Link href="/admin/projects" className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
-              Open projects
-            </Link>
-          )}
+            )}
+          </div>
         </div>
       </section>
 
@@ -150,18 +175,52 @@ export default async function AdminOverviewPage() {
         ))}
       </div>
 
-      {quieter.length > 0 ? (
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {quieter.map((card) => (
-            <Link
-              key={card.label}
-              href={card.href}
-              className="rounded-2xl bg-white/80 px-4 py-3 ring-1 ring-slate-200/70 transition hover:ring-emerald-300"
-            >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">{card.label}</p>
-              <p className="mt-1 font-display text-xl font-bold text-slate-950">{card.value}</p>
-            </Link>
-          ))}
+      {growth ? (
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          <BarList
+            title="Where briefs sit"
+            hint={
+              [
+                report.byStage[openStage.id] > 0
+                  ? `The largest open group is ${openStage.label.toLowerCase()}.`
+                  : "No open briefs yet.",
+                report.winRate === null ? "" : `${Math.round(report.winRate * 100)}% of closed briefs were won.`,
+              ]
+                .filter(Boolean)
+                .join(" ")
+            }
+            rows={leadStages.map((stage) => ({
+              label: stage.label,
+              value: report.byStage[stage.id],
+              bar: stageBars[stage.id],
+            }))}
+          />
+          <BarList
+            title="Outreach health"
+            hint={
+              unmailed > 0
+                ? `${unmailed} collected ${unmailed === 1 ? "lead has" : "leads have"} not had a first mail.`
+                : "Every open lead has a first mail, or none are waiting."
+            }
+            rows={[
+              { label: "Open", value: outcomeCounts.open, bar: outcomeBars.open },
+              { label: "Responded", value: outcomeCounts.responded, bar: outcomeBars.responded },
+              { label: "Aligned", value: outcomeCounts.aligned, bar: outcomeBars.aligned },
+              { label: "Converted", value: outcomeCounts.converted, bar: outcomeBars.converted },
+              { label: "Wasted", value: outcomeCounts.wasted, bar: outcomeBars.wasted },
+            ]}
+          />
+          <BarList
+            title="Delivery load"
+            hint="In progress is the work being built now."
+            rows={[
+              ...(pipeline
+                ? [{ label: "Pipeline", value: report.byStatus.pipeline, bar: "bg-amber-400" }]
+                : []),
+              { label: "In progress", value: report.byStatus.ongoing, bar: "bg-emerald-500" },
+              { label: "Completed", value: report.byStatus.completed, bar: "bg-slate-400" },
+            ]}
+          />
         </div>
       ) : null}
 
@@ -187,7 +246,7 @@ export default async function AdminOverviewPage() {
           )}
         </section>
 
-        {canView(session.role, "leads") ? (
+        {growth ? (
           <section className="rounded-3xl bg-white p-6 ring-1 ring-slate-200/80 lg:col-span-2">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-lg font-semibold text-slate-950">Latest briefs</h2>
@@ -252,9 +311,6 @@ export default async function AdminOverviewPage() {
               ))}
             </ul>
           )}
-          {report.openTasks.length > 0 ? (
-            <p className="mt-4 text-xs text-slate-400">{report.openTasks.length} open tasks across active work.</p>
-          ) : null}
         </section>
       ) : null}
     </div>

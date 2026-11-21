@@ -36,7 +36,7 @@ export default function BookPage() {
         <div className="mt-10 rounded-3xl border border-slate-100 bg-slate-50 p-6 md:p-8">
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Pick a time.</h2>
           <p className="text-slate-600 mb-6">
-            Weekdays, morning through dinner for clients in the US and Europe. We hold the slot and confirm by email.
+            Choose your timezone, then a date and a time. Morning through dinner for clients in the US and Europe.
           </p>
           <BookingCalendar slots={slots} />
         </div>

@@ -94,6 +94,7 @@ export default function OutreachDesk({ initialLeads }: { initialLeads: CmsOutrea
   const [query, setQuery] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [openId, setOpenId] = useState<string | null>(null);
   const saveQueue = useRef<Promise<unknown>>(Promise.resolve());
 
   const visible = useMemo(() => {
@@ -209,25 +210,27 @@ export default function OutreachDesk({ initialLeads }: { initialLeads: CmsOutrea
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
-        {[
-          ["Collected", counts.all],
-          ["Not mailed", counts.unsent],
-          ["Responded", counts.responded],
-          ["Aligned", counts.aligned],
-          ["Converted", counts.converted],
-          ["Wasted", counts.wasted],
-        ].map(([label, value]) => (
-          <div key={label} className="rounded-2xl bg-white border border-slate-200 px-4 py-3">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">{label}</p>
-            <p className="text-2xl font-extrabold text-slate-900 mt-1">{value}</p>
+        {(
+          [
+            ["Collected", counts.all, "bg-slate-900 text-white border-slate-900"],
+            ["Not mailed", counts.unsent, "bg-sky-50 text-sky-950 border-sky-200"],
+            ["Responded", counts.responded, "bg-indigo-50 text-indigo-950 border-indigo-200"],
+            ["Aligned", counts.aligned, "bg-amber-50 text-amber-950 border-amber-200"],
+            ["Converted", counts.converted, "bg-emerald-50 text-emerald-950 border-emerald-200"],
+            ["Wasted", counts.wasted, "bg-rose-50 text-rose-950 border-rose-200"],
+          ] as const
+        ).map(([label, value, tone]) => (
+          <div key={label} className={`rounded-2xl border px-4 py-3 ${tone}`}>
+            <p className="text-[11px] font-bold uppercase tracking-wide opacity-70">{label}</p>
+            <p className="text-2xl font-extrabold mt-1">{value}</p>
           </div>
         ))}
       </div>
 
       <section className="rounded-2xl bg-white border border-slate-200 p-5">
         <h2 className="font-semibold text-slate-900">Add a collected lead</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
-          <Field label="Company" value={form.company} onChange={(company) => setForm({ ...form, company })} />
+        <div className="grid sm:grid-cols-2 gap-3 mt-4">
+          <Field label="Name" value={form.company} onChange={(company) => setForm({ ...form, company })} />
           <Field label="Contact" value={form.contactName} onChange={(contactName) => setForm({ ...form, contactName })} />
           <Field label="Email" value={form.email} onChange={(email) => setForm({ ...form, email })} type="email" />
           <Field label="Phone" value={form.phone} onChange={(phone) => setForm({ ...form, phone })} />
@@ -276,7 +279,7 @@ export default function OutreachDesk({ initialLeads }: { initialLeads: CmsOutrea
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search company, contact, email"
+          placeholder="Search name, contact, email"
           className="lg:ml-auto w-full lg:w-72 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
           aria-label="Search cold leads"
         />
@@ -284,19 +287,52 @@ export default function OutreachDesk({ initialLeads }: { initialLeads: CmsOutrea
 
       {visible.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-slate-500">
-          {leads.length === 0 ? "No cold leads yet. Add the first company you want to approach." : "Nothing matches this filter."}
+          {leads.length === 0 ? "No cold leads yet. Add the first name you want to approach." : "Nothing matches this filter."}
         </div>
       ) : (
         <div className="space-y-4">
           {visible.map((lead) => {
             const draft = draftOf(lead);
             const outcome = outcomeOf(draft);
+            const open = openId === lead.id;
+            const links = uniqueLinks(`${lead.credentials}\n${lead.approach}\n${lead.notes}`);
             return (
-              <article key={lead.id} className="rounded-2xl bg-white border border-slate-200 p-5">
+              <article key={lead.id} className="rounded-2xl bg-white border border-slate-200">
+                <div className="flex items-start gap-3 px-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <button
+                      type="button"
+                      onClick={() => setOpenId(open ? null : lead.id)}
+                      aria-expanded={open}
+                      className="w-full text-left"
+                    >
+                      <span className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold text-slate-900">{lead.company || "Untitled"}</span>
+                        <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${outcomeTone[outcome]}`}>
+                          {outreachOutcomes.find((option) => option.id === outcome)?.label}
+                        </span>
+                      </span>
+                      <span className="mt-1 block text-sm text-slate-500 truncate">
+                        {[lead.contactName, lead.email, lead.phone].filter(Boolean).join(" · ") || "No contact yet"}
+                      </span>
+                      <span className="mt-1 block text-xs text-slate-400">
+                        {lead.firstMailSent ? `First mail ${lead.firstMailDate || "sent"}` : "First mail not sent"}
+                        {" · "}
+                        {lead.secondMailSent ? `Second mail ${lead.secondMailDate || "sent"}` : "Second mail not sent"}
+                      </span>
+                    </button>
+                    {links.length > 0 ? <LinkList text={`${lead.credentials}\n${lead.approach}\n${lead.notes}`} /> : null}
+                  </div>
+                  <button type="button" onClick={() => void remove(lead.id)} className="text-xs font-semibold text-red-600">
+                    Remove
+                  </button>
+                </div>
+                {open ? (
+                <div className="border-t border-slate-100 p-5">
                 <div className="flex flex-col lg:flex-row lg:items-start gap-3">
                   <div className="flex-1 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     <Field
-                      label="Company"
+                      label="Name"
                       value={draft.company}
                       onChange={(company) => editDraft(lead.id, lead, { company })}
                       onBlur={() => saveText(lead)}
@@ -340,14 +376,6 @@ export default function OutreachDesk({ initialLeads }: { initialLeads: CmsOutrea
                         ))}
                       </select>
                     </label>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${outcomeTone[outcome]}`}>
-                      {outreachOutcomes.find((option) => option.id === outcome)?.label}
-                    </span>
-                    <button type="button" onClick={() => void remove(lead.id)} className="text-xs font-semibold text-red-600">
-                      Remove
-                    </button>
                   </div>
                 </div>
 
@@ -412,32 +440,68 @@ export default function OutreachDesk({ initialLeads }: { initialLeads: CmsOutrea
                 </fieldset>
 
                 <div className="grid lg:grid-cols-3 gap-3 mt-4">
-                  <Area
-                    label="Approach context"
-                    value={draft.approach}
-                    onChange={(approach) => editDraft(lead.id, lead, { approach })}
-                    onBlur={() => saveText(lead)}
-                  />
-                  <Area
-                    label="Client credentials"
-                    hint="Private to leadership."
-                    value={draft.credentials}
-                    onChange={(credentials) => editDraft(lead.id, lead, { credentials })}
-                    onBlur={() => saveText(lead)}
-                  />
-                  <Area
-                    label="Notes"
-                    value={draft.notes}
-                    onChange={(notes) => editDraft(lead.id, lead, { notes })}
-                    onBlur={() => saveText(lead)}
-                  />
+                  <div>
+                    <Area
+                      label="Approach context"
+                      value={draft.approach}
+                      onChange={(approach) => editDraft(lead.id, lead, { approach })}
+                      onBlur={() => saveText(lead)}
+                    />
+                    <LinkList text={draft.approach} />
+                  </div>
+                  <div>
+                    <Area
+                      label="Client credentials"
+                      hint="Private to leadership. Paste a full https link and it stays clickable."
+                      value={draft.credentials}
+                      onChange={(credentials) => editDraft(lead.id, lead, { credentials })}
+                      onBlur={() => saveText(lead)}
+                    />
+                    <LinkList text={draft.credentials} />
+                  </div>
+                  <div>
+                    <Area
+                      label="Notes"
+                      value={draft.notes}
+                      onChange={(notes) => editDraft(lead.id, lead, { notes })}
+                      onBlur={() => saveText(lead)}
+                    />
+                    <LinkList text={draft.notes} />
+                  </div>
                 </div>
+                </div>
+                ) : null}
               </article>
             );
           })}
         </div>
       )}
     </div>
+  );
+}
+
+function uniqueLinks(text: string) {
+  const found = text.match(/https?:\/\/[^\s<>"']+/g) ?? [];
+  return [...new Set(found.map((url) => url.replace(/[),.;]+$/, "")))];
+}
+
+function LinkList({ text }: { text: string }) {
+  const links = uniqueLinks(text);
+  if (links.length === 0) return null;
+  return (
+    <p className="mt-2 flex flex-wrap gap-2">
+      {links.map((url) => (
+        <a
+          key={url}
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="text-xs font-semibold text-emerald-700 underline break-all"
+        >
+          {url.replace(/^https?:\/\//, "")}
+        </a>
+      ))}
+    </p>
   );
 }
 
